@@ -180,4 +180,203 @@ public class ApiRequestService {
         .map(this::convertToDTO)
         .toList();
     }
+
+    public ApiRequestSummaryResponse getRequest(Long workspaceId, Long collectionId, Long requestId){
+        Authentication authentication =
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication();
+
+        User currentUser = (User) authentication.getPrincipal();
+        // Workspace present or not
+        Workspace existsWorkspace = workspaceRepository.findById(workspaceId)
+        .orElseThrow(()-> new RuntimeException("Workspace not found"));
+
+        // Collection present or not
+        Collection existsCollection = collectionRepository.findById(collectionId)
+        .orElseThrow(()-> new RuntimeException("Collection not found"));
+
+        // Request present or not
+        ApiRequest existsRequest = apiRequestRepository.findById(requestId)
+        .orElseThrow(()-> new RuntimeException("Request not found"));
+
+        if(!existsRequest.getCollection().getId().equals(collectionId)){
+            throw new RuntimeException("Request does not belong to the specified collection");
+        }
+        // Collection belongs to workspace or not
+        if (!existsCollection.getWorkspace().getId().equals(workspaceId)) {
+            throw new RuntimeException("Collection does not belong to the specified workspace");
+        }
+        // Check if user belongs to workspace or is he member or not
+        WorkspaceMember workspaceMember =
+                workspaceMemberRepository.findByWorkspaceAndUser(existsWorkspace, currentUser);
+
+        if (workspaceMember == null) {
+            throw new RuntimeException("User is not a member of the workspace");
+        }
+
+        return convertToDTO(existsRequest);
+    }
+
+    public ApiRequestSummaryResponse updateRequest(Long workspaceId, Long collectionId, Long requestId, ApiCreateRequest request){
+        Authentication authentication =
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication();
+
+        User currentUser = (User) authentication.getPrincipal();
+        // Workspace present or not
+        Workspace existsWorkspace = workspaceRepository.findById(workspaceId)
+        .orElseThrow(()-> new RuntimeException("Workspace not found"));
+
+        // Collection present or not
+        Collection existsCollection = collectionRepository.findById(collectionId)
+        .orElseThrow(()-> new RuntimeException("Collection not found"));
+
+        // Request present or not
+        ApiRequest existsRequest = apiRequestRepository.findById(requestId)
+        .orElseThrow(()-> new RuntimeException("Request not found"));
+
+        if(!existsRequest.getCollection().getId().equals(collectionId)){
+            throw new RuntimeException("Request does not belong to the specified collection");
+        }
+        // Collection belongs to workspace or not
+        if (!existsCollection.getWorkspace().getId().equals(workspaceId)) {
+            throw new RuntimeException("Collection does not belong to the specified workspace");
+        }
+        // Check if user belongs to workspace or is he member or not
+        WorkspaceMember workspaceMember =
+                workspaceMemberRepository.findByWorkspaceAndUser(existsWorkspace, currentUser);
+
+        if (workspaceMember == null) {
+            throw new RuntimeException("User is not a member of the workspace");
+        }
+
+        // VIEWER cannot update
+        if (workspaceMember.getRole() == WorkspaceRole.VIEWER) {
+            throw new RuntimeException("You do not have permission to update this request");
+        }
+
+        // Update fields
+        existsRequest.setName(request.getName());
+        existsRequest.setDescription(request.getDescription());
+        existsRequest.setMethod(request.getMethod());
+        existsRequest.setUrl(request.getUrl());
+        existsRequest.setBody(request.getBody());
+
+        ApiRequest updatedRequest = apiRequestRepository.save(existsRequest);
+
+        return convertToDTO(updatedRequest);
+    }
+
+    public String deleteRequest(Long workspaceId, Long collectionId, Long requestId) {
+
+        Authentication authentication = SecurityContextHolder
+                .getContext()
+                .getAuthentication();
+
+        User currentUser = (User) authentication.getPrincipal();
+
+        // Workspace exists
+        Workspace existsWorkspace = workspaceRepository.findById(workspaceId)
+                .orElseThrow(() -> new RuntimeException("Workspace not found"));
+
+        // Collection exists
+        Collection existsCollection = collectionRepository.findById(collectionId)
+                .orElseThrow(() -> new RuntimeException("Collection not found"));
+
+        // Collection belongs to workspace
+        if (!existsCollection.getWorkspace().getId().equals(workspaceId)) {
+            throw new RuntimeException("Collection does not belong to the specified workspace");
+        }
+
+        // Request exists
+        ApiRequest existsRequest = apiRequestRepository.findById(requestId)
+                .orElseThrow(() -> new RuntimeException("Request not found"));
+
+        // Request belongs to collection
+        if (!existsRequest.getCollection().getId().equals(collectionId)) {
+            throw new RuntimeException("Request does not belong to the specified collection");
+        }
+
+        // User is a workspace member
+        WorkspaceMember workspaceMember =
+                workspaceMemberRepository.findByWorkspaceAndUser(existsWorkspace, currentUser);
+
+        if (workspaceMember == null) {
+            throw new RuntimeException("User is not a member of the workspace");
+        }
+
+        // Only ADMIN and EDITOR can delete
+        if (workspaceMember.getRole() == WorkspaceRole.VIEWER) {
+            throw new RuntimeException("You do not have permission to delete this request");
+        }
+
+        apiRequestRepository.delete(existsRequest);
+
+        return "Request deleted successfully";
+    }
+
+    public ApiRequestSummaryResponse duplicateRequest(
+        Long workspaceId,
+        Long collectionId,
+        Long requestId) {
+
+        Authentication authentication = SecurityContextHolder
+                .getContext()
+                .getAuthentication();
+
+        User currentUser = (User) authentication.getPrincipal();
+
+        // Workspace exists
+        Workspace existsWorkspace = workspaceRepository.findById(workspaceId)
+                .orElseThrow(() -> new RuntimeException("Workspace not found"));
+
+        // Collection exists
+        Collection existsCollection = collectionRepository.findById(collectionId)
+                .orElseThrow(() -> new RuntimeException("Collection not found"));
+
+        // Collection belongs to workspace
+        if (!existsCollection.getWorkspace().getId().equals(workspaceId)) {
+            throw new RuntimeException("Collection does not belong to the specified workspace");
+        }
+
+        // Request exists
+        ApiRequest existsRequest = apiRequestRepository.findById(requestId)
+                .orElseThrow(() -> new RuntimeException("Request not found"));
+
+        // Request belongs to collection
+        if (!existsRequest.getCollection().getId().equals(collectionId)) {
+            throw new RuntimeException("Request does not belong to the specified collection");
+        }
+
+        // User is workspace member
+        WorkspaceMember workspaceMember =
+                workspaceMemberRepository.findByWorkspaceAndUser(existsWorkspace, currentUser);
+
+        if (workspaceMember == null) {
+            throw new RuntimeException("User is not a member of the workspace");
+        }
+
+        // VIEWER cannot duplicate
+        if (workspaceMember.getRole() == WorkspaceRole.VIEWER) {
+            throw new RuntimeException("You do not have permission to duplicate this request");
+        }
+
+        // Create duplicate
+        ApiRequest duplicateRequest = new ApiRequest();
+
+        duplicateRequest.setName(existsRequest.getName() + " Copy");
+        duplicateRequest.setDescription(existsRequest.getDescription());
+        duplicateRequest.setMethod(existsRequest.getMethod());
+        duplicateRequest.setUrl(existsRequest.getUrl());
+        duplicateRequest.setBody(existsRequest.getBody());
+
+        duplicateRequest.setCollection(existsCollection);
+        duplicateRequest.setCreatedBy(currentUser);
+
+        ApiRequest savedRequest = apiRequestRepository.save(duplicateRequest);
+
+        return convertToDTO(savedRequest);
+    }
 }

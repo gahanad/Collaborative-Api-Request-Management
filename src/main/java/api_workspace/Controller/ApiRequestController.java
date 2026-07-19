@@ -46,4 +46,57 @@ public class ApiRequestController {
             )
         );
     }
+
+    @GetMapping("/{workspaceId}/collections/{collectionId}/requests/{requestId}")
+    public ResponseEntity<ApiRequestSummaryResponse> getRequest(
+        @PathVariable Long workspaceId,
+        @PathVariable Long collectionId,
+        @PathVariable Long requestId
+    ){
+        return ResponseEntity.ok(
+            apiRequestService.getRequest(
+                workspaceId, collectionId, requestId
+            )
+        );
+    }
+
+    @PutMapping("/{workspaceId}/collections/{collectionId}/requests/{requestId}")
+    public ResponseEntity<ApiRequestSummaryResponse> updateRequest(
+        @PathVariable Long workspaceId,
+        @PathVariable Long collectionId,
+        @PathVariable Long requestId,
+        @RequestBody ApiCreateRequest request
+    ){
+        return ResponseEntity.ok(
+            apiRequestService.updateRequest(
+                workspaceId, collectionId, requestId, request
+            )
+        );
+    }
+
+    @DeleteMapping("/{workspaceId}/collections/{collectionId}/requests/{requestId}")
+    public ResponseEntity<String> deleteRequest(
+            @PathVariable Long workspaceId,
+            @PathVariable Long collectionId,
+            @PathVariable Long requestId) {
+
+        return ResponseEntity.ok(
+                apiRequestService.deleteRequest(
+                        workspaceId,
+                        collectionId,
+                        requestId));
+    }
+
+    @PostMapping("/{workspaceId}/collections/{collectionId}/requests/{requestId}/duplicate")
+    public ResponseEntity<ApiRequestSummaryResponse> duplicateRequest(
+            @PathVariable Long workspaceId,
+            @PathVariable Long collectionId,
+            @PathVariable Long requestId) {
+
+        return ResponseEntity.ok(
+                apiRequestService.duplicateRequest(
+                        workspaceId,
+                        collectionId,
+                        requestId));
+    }
 }
