@@ -34,11 +34,6 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/users/signup",
                                 "/users/login"
-                                // "/workspace/createSpace",
-                                // "/workspace/getSpace",
-                                // "/workspace/getAllSpace",
-                                // "/workspace/getSpaceById",
-                                // "/workspace/deleteSpaceById"
                         ).permitAll()
 
                         .anyRequest()
