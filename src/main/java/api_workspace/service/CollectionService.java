@@ -11,6 +11,8 @@ import api_workspace.dto.collection.CollectionSummaryResponse;
 import api_workspace.dto.user.UserSummary;
 import api_workspace.dto.workspace.WorkspaceSummary;
 import api_workspace.entity.Collection;
+import api_workspace.service.*;
+import api_workspace.enums.*;
 // import api_workspace.controller.CollectionController;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,6 +27,8 @@ public class CollectionService{
     private final CollectionRepository collectionRepository;
     private final WorkspaceMemberRepository workspaceMemberRepository;
     private final WorkspaceRepository workspaceRepository;
+    private final ActivityLogService activityLogService;
+    private final WorkspaceEventService workspaceEventService;
     private CollectionSummaryResponse convertToDTO(Collection collection) {
 
     // Create the main DTO
@@ -60,11 +64,15 @@ public class CollectionService{
 
         return collectionDTO;
     }
-    public CollectionService(CollectionRepository collectionRepository, WorkspaceMemberRepository workspaceMemberRepository, WorkspaceRepository workspaceRepository){
+    public CollectionService(CollectionRepository collectionRepository, 
+        WorkspaceEventService workspaceEventService,
+        WorkspaceMemberRepository workspaceMemberRepository, WorkspaceRepository workspaceRepository, ActivityLogService activityLogService){
         // this.collectionController = collectionController;
         this.collectionRepository = collectionRepository;
         this.workspaceMemberRepository = workspaceMemberRepository;
         this.workspaceRepository = workspaceRepository;
+        this.activityLogService = activityLogService;
+        this.workspaceEventService = workspaceEventService;
     }
 
     // Creating a new collection
@@ -90,6 +98,22 @@ public class CollectionService{
             collection.setCreatedBy(currentUser);
             collectionRepository.save(collection);
         }
+        // Saving activity logs
+        activityLogService.logActivity(
+                existWorkspace,
+                currentUser,
+                ActivityAction.CREATED,
+                ResourceType.COLLECTION,
+                collection.getName()
+        );
+
+        workspaceEventService.sendEvent(
+            existWorkspace.getId(),
+            "COLLECTION_CREATED",
+            "COLLECTION",
+            collection.getName(),
+            currentUser.getName()
+        );
     }
 
     // Retrieving all collections for a specific workspace
@@ -125,5 +149,21 @@ public class CollectionService{
         } else {
             collectionRepository.delete(collection);
         }
+        // Saving activity logs
+        activityLogService.logActivity(
+                workspace,
+                currentUser,
+                ActivityAction.DELETED,
+                ResourceType.COLLECTION,
+                collection.getName()
+        );
+
+        workspaceEventService.sendEvent(
+            workspace.getId(),
+            "COLLECTION_CREATED",
+            "COLLECTION",
+            collection.getName(),
+            currentUser.getName()
+        );
     }
 }

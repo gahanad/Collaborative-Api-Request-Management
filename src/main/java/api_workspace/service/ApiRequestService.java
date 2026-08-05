@@ -1,20 +1,19 @@
 package api_workspace.service;
 
 import api_workspace.dto.request.ApiCreateRequest;
+import api_workspace.dto.authorization.*;
 import api_workspace.dto.request.ApiRequestSummaryResponse;
 import api_workspace.dto.user.UserSummary;
 import api_workspace.dto.collection.CollectionSummaryResponse;
 import api_workspace.dto.workspace.WorkspaceSummary;
-import api_workspace.entity.ApiRequest;
-import api_workspace.entity.Collection;
-import api_workspace.entity.User;
-import api_workspace.entity.Workspace;
-import api_workspace.entity.WorkspaceMember;
+import api_workspace.entity.*;
 import api_workspace.enums.WorkspaceRole;
-import api_workspace.repository.ApiRequestRepository;
+import api_workspace.repository.*;
 import api_workspace.repository.CollectionRepository;
 import api_workspace.repository.WorkspaceMemberRepository;
 import api_workspace.repository.WorkspaceRepository;
+import api_workspace.service.*;
+import api_workspace.enums.*;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,12 +28,19 @@ public class ApiRequestService {
     private final CollectionRepository collectionRepository;
     private final WorkspaceMemberRepository workspaceMemberRepository;
     private final WorkspaceRepository workspaceRepository;
+    private final ActivityLogService activityLogService;
+    private final AuthorizationRepository authorizationRepository;
+    private final WorkspaceEventService workspaceEventService;
 
-    public ApiRequestService(ApiRequestRepository apiRequestRepository, CollectionRepository collectionRepository, WorkspaceMemberRepository workspaceMemberRepository, WorkspaceRepository workspaceRepository) {
+
+    public ApiRequestService(ApiRequestRepository apiRequestRepository, CollectionRepository collectionRepository, WorkspaceMemberRepository workspaceMemberRepository, WorkspaceRepository workspaceRepository, ActivityLogService activityLogService, AuthorizationRepository authorizationRepository, WorkspaceEventService workspaceEventService) {
         this.apiRequestRepository = apiRequestRepository;
         this.collectionRepository = collectionRepository;
         this.workspaceMemberRepository = workspaceMemberRepository;
         this.workspaceRepository = workspaceRepository;
+        this.activityLogService = activityLogService;
+        this.authorizationRepository = authorizationRepository;
+        this.workspaceEventService = workspaceEventService;
     }
 
     private ApiRequestSummaryResponse convertToDTO(ApiRequest apiRequest) {
@@ -95,6 +101,22 @@ public class ApiRequestService {
 
         collectionDTO.setCreatedBy(collectionCreator);
 
+        Authorization auth = apiRequest.getAuthorization();
+
+        if (auth != null) {
+            AuthorizationResponse authDTO = new AuthorizationResponse();
+
+            authDTO.setAuthType(auth.getAuthType());
+            authDTO.setBearerToken(auth.getBearerToken());
+            authDTO.setUsername(auth.getUsername());
+            authDTO.setPassword(auth.getPassword());
+            authDTO.setApiKeyName(auth.getApiKeyName());
+            authDTO.setApiKey(auth.getApiKey());
+            authDTO.setApiKeyLocation(auth.getApiKeyLocation());
+
+            response.setAuthorization(authDTO);
+        }
+
         response.setCollection(collectionDTO);
 
         return response;
@@ -146,6 +168,34 @@ public class ApiRequestService {
 
         ApiRequest savedApiRequest = apiRequestRepository.save(apiRequest);
 
+        Authorization authorization = new Authorization();
+
+        authorization.setApiRequest(apiRequest);
+        authorization.setAuthType(request.getAuthType());
+        authorization.setBearerToken(request.getBearerToken());
+        authorization.setUsername(request.getUsername());
+        authorization.setPassword(request.getPassword());
+        authorization.setApiKeyName(request.getApiKeyName());
+        authorization.setApiKey(request.getApiKey());
+        authorization.setApiKeyLocation(request.getApiKeyLocation());
+
+        authorizationRepository.save(authorization);
+
+        // Saving activity logs
+        activityLogService.logActivity(
+                workspace,
+                currentUser,
+                ActivityAction.CREATED,
+                ResourceType.REQUEST,
+                apiRequest.getName()
+        );
+        workspaceEventService.sendEvent(
+            workspace.getId(),
+            "REQUEST_CREATED",
+            "REQUEST",
+            apiRequest.getName(),
+            currentUser.getName()
+        );
         // Convert to DTO and return
         return convertToDTO(savedApiRequest);
     }
@@ -266,6 +316,22 @@ public class ApiRequestService {
 
         ApiRequest updatedRequest = apiRequestRepository.save(existsRequest);
 
+        // Saving activity logs
+        activityLogService.logActivity(
+                existsWorkspace,
+                currentUser,
+                ActivityAction.UPDATED,
+                ResourceType.REQUEST,
+                existsRequest.getName()
+        );
+
+        workspaceEventService.sendEvent(
+            existsWorkspace.getId(),
+            "REQUEST_UPDATED",
+            "REQUEST",
+            existsRequest.getName(),
+            currentUser.getName()
+        );
         return convertToDTO(updatedRequest);
     }
 
@@ -314,6 +380,22 @@ public class ApiRequestService {
 
         apiRequestRepository.delete(existsRequest);
 
+        // Saving activity logs
+        activityLogService.logActivity(
+                existsWorkspace,
+                currentUser,
+                ActivityAction.DELETED,
+                ResourceType.REQUEST,
+                existsRequest.getName()
+        );
+
+        workspaceEventService.sendEvent(
+            existsWorkspace.getId(),
+            "REQUEST_DELETED",
+            "REQUEST",
+            existsRequest.getName(),
+            currentUser.getName()
+        );
         return "Request deleted successfully";
     }
 
@@ -376,6 +458,14 @@ public class ApiRequestService {
         duplicateRequest.setCreatedBy(currentUser);
 
         ApiRequest savedRequest = apiRequestRepository.save(duplicateRequest);
+
+        workspaceEventService.sendEvent(
+            existsWorkspace.getId(),
+            "REQUEST_DUPLICATED",
+            "REQUEST",
+            existsRequest.getName(),
+            currentUser.getName()
+        );
 
         return convertToDTO(savedRequest);
     }

@@ -61,4 +61,9 @@ public class ApiRequest {
 
     @OneToMany(mappedBy = "apiRequest", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RequestQueryParam> queryParams = new ArrayList<>();
+
+    @OneToOne(mappedBy = "apiRequest",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    private Authorization authorization;
 }

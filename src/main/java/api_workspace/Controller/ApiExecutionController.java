@@ -19,17 +19,19 @@ public class ApiExecutionController{
         this.apiExecutionService = apiExecutionService;
     } 
     
-    @PostMapping("/{workspaceId}/collections/{collectionId}/requests/{requestId}/execute")
+    @PostMapping("/{workspaceId}/collections/{collectionId}/requests/{requestId}/execute/{environmentId}")
     public ResponseEntity<ApiExecutionResponse> executeRequest(
             @PathVariable Long workspaceId,
             @PathVariable Long collectionId,
-            @PathVariable Long requestId) {
+            @PathVariable Long requestId, 
+            @PathVariable Long environmentId) {
 
         return ResponseEntity.ok(
                 apiExecutionService.executeRequest(
                         workspaceId,
                         collectionId,
-                        requestId
+                        requestId,
+                        environmentId
                 )
         );
     }

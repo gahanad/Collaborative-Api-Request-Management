@@ -5,7 +5,7 @@ import api_workspace.service.EnvironmentVariableService;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -23,7 +23,7 @@ public class EnvironmentVariableController {
     // Create Variable
     @PostMapping("/{environmentId}/variables")
     public ResponseEntity<EnvironmentVariableResponse> createVariable(
-
+            @Valid
             @PathVariable Long environmentId,
 
             @RequestBody CreateEnvironmentVariableRequest request) {

@@ -2,6 +2,7 @@ package api_workspace.dto.request;
 
 import api_workspace.dto.collection.CollectionSummaryResponse;
 import api_workspace.dto.user.UserSummary;
+import api_workspace.dto.authorization.*;
 
 import api_workspace.enums.HttpMethodType;
 import lombok.Getter;
@@ -32,4 +33,6 @@ public class ApiRequestSummaryResponse {
     private UserSummary createdBy;
 
     private CollectionSummaryResponse collection;
+
+    private AuthorizationResponse authorization;
 }

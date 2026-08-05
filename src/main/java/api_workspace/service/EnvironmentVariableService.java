@@ -4,6 +4,8 @@ import api_workspace.dto.environment.*;
 import api_workspace.entity.*;
 import api_workspace.enums.WorkspaceRole;
 import api_workspace.repository.*;
+import api_workspace.service.*;
+import api_workspace.enums.*;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,15 +20,18 @@ public class EnvironmentVariableService {
     private final EnvironmentRepository environmentRepository;
     private final EnvironmentVariableRepository environmentVariableRepository;
     private final WorkspaceMemberRepository workspaceMemberRepository;
+    private final ActivityLogService activityLogService;
 
     public EnvironmentVariableService(
             EnvironmentRepository environmentRepository,
             EnvironmentVariableRepository environmentVariableRepository,
-            WorkspaceMemberRepository workspaceMemberRepository) {
+            WorkspaceMemberRepository workspaceMemberRepository,
+            ActivityLogService activityLogService) {
 
         this.environmentRepository = environmentRepository;
         this.environmentVariableRepository = environmentVariableRepository;
         this.workspaceMemberRepository = workspaceMemberRepository;
+        this.activityLogService = activityLogService;
     }
 
     // Create Variable
@@ -67,6 +72,14 @@ public class EnvironmentVariableService {
         EnvironmentVariable saved =
                 environmentVariableRepository.save(variable);
 
+        // Saving activity logs
+        activityLogService.logActivity(
+                workspace,
+                currentUser,
+                ActivityAction.CREATED,
+                ResourceType.VARIABLE,
+                variable.getVariableKey()
+        );
         return new EnvironmentVariableResponse(
                 saved.getId(),
                 saved.getVariableKey(),
@@ -155,6 +168,14 @@ public class EnvironmentVariableService {
         EnvironmentVariable updated =
                 environmentVariableRepository.save(variable);
 
+        // Saving activity logs
+        activityLogService.logActivity(
+                workspace,
+                currentUser,
+                ActivityAction.UPDATED,
+                ResourceType.VARIABLE,
+                variable.getVariableKey()
+        );
         return new EnvironmentVariableResponse(
                 updated.getId(),
                 updated.getVariableKey(),
@@ -192,5 +213,14 @@ public class EnvironmentVariableService {
         }
 
         environmentVariableRepository.delete(variable);
+
+        // Saving activity logs
+        activityLogService.logActivity(
+                workspace,
+                currentUser,
+                ActivityAction.DELETED,
+                ResourceType.VARIABLE,
+                variable.getVariableKey()
+        );
     }
 }

@@ -3,6 +3,8 @@ package api_workspace.service;
 import api_workspace.dto.environment.*;
 import api_workspace.entity.*;
 import api_workspace.repository.*;
+import api_workspace.service.*;
+import api_workspace.enums.*;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,15 +19,21 @@ public class EnvironmentService {
     private final WorkspaceRepository workspaceRepository;
     private final WorkspaceMemberRepository workspaceMemberRepository;
     private final EnvironmentRepository environmentRepository;
+    private final ActivityLogService activityLogService;
+    private final WorkspaceEventService workspaceEventService;
 
     public EnvironmentService(
             WorkspaceRepository workspaceRepository,
             WorkspaceMemberRepository workspaceMemberRepository,
-            EnvironmentRepository environmentRepository) {
+            EnvironmentRepository environmentRepository,
+            WorkspaceEventService workspaceEventService,
+            ActivityLogService activityLogService) {
 
         this.workspaceRepository = workspaceRepository;
         this.workspaceMemberRepository = workspaceMemberRepository;
         this.environmentRepository = environmentRepository;
+        this.activityLogService = activityLogService;
+        this.workspaceEventService = workspaceEventService;
     }
 
     // Create Environment
@@ -60,6 +68,22 @@ public class EnvironmentService {
         Environment saved =
                 environmentRepository.save(environment);
 
+        // Saving activity logs
+        activityLogService.logActivity(
+                workspace,
+                currentUser,
+                ActivityAction.CREATED,
+                ResourceType.ENVIRONMENT,
+                environment.getName()
+        );
+
+        workspaceEventService.sendEvent(
+                workspace.getId(),
+                "ENVIRONMENT_CREATED",
+                "ENVIRONMENT",
+                environment.getName(),
+                currentUser.getName()
+        );
         return new EnvironmentResponse(
                 saved.getId(),
                 saved.getName()
@@ -143,6 +167,22 @@ public class EnvironmentService {
         Environment updated =
                 environmentRepository.save(environment);
 
+        // Saving activity logs
+        activityLogService.logActivity(
+                workspace,
+                currentUser,
+                ActivityAction.UPDATED,
+                ResourceType.ENVIRONMENT,
+                environment.getName()
+        );
+
+        workspaceEventService.sendEvent(
+                workspace.getId(),
+                "ENVIRONMENT_UPDATED",
+                "ENVIRONMENT",
+                environment.getName(),
+                currentUser.getName()
+        );
         return new EnvironmentResponse(
                 updated.getId(),
                 updated.getName()
@@ -177,5 +217,22 @@ public class EnvironmentService {
             throw new RuntimeException("User does not have permission to delete the collection");
         }
         environmentRepository.delete(environment);
+
+        // Saving activity logs
+        activityLogService.logActivity(
+                workspace,
+                currentUser,
+                ActivityAction.DELETED,
+                ResourceType.ENVIRONMENT,
+                environment.getName()
+        );
+
+        workspaceEventService.sendEvent(
+                workspace.getId(),
+                "ENVIRONMENT_DELETED",
+                "ENVIRONMENT",
+                environment.getName(),
+                currentUser.getName()
+        );
     }
 }

@@ -1,17 +1,20 @@
 package api_workspace.dto.workspace;
-// import api_workspace.enums.WorkspaceRole;
-import api_workspace.entity.Workspace;
-import jakarta.persistence.*;
-import java.time.LocalDateTime;
-import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
-public class WorkspaceSummary{
+public class WorkspaceSummary {
+
     private Long id;
+
     private String name;
+
     private String description;
+
     private LocalDateTime createdAt;
+
 }

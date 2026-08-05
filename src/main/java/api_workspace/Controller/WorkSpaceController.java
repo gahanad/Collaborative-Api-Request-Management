@@ -3,9 +3,10 @@ package api_workspace.controller;
 import api_workspace.entity.Workspace;
 import api_workspace.repository.WorkspaceRepository;
 import api_workspace.service.WorkspaceService;
-import api_workspace.dto.workspace.InviteRequest;
+import api_workspace.dto.workspace.*;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import jakarta.validation.Valid;
 
 
 @RestController
@@ -15,26 +16,28 @@ public class WorkSpaceController{
     public WorkSpaceController(WorkspaceService workspaceService){
         this.workspaceService = workspaceService;
     }
-    @PostMapping("/createSpace")
-    public String createWorkspace(@RequestBody Workspace workspace){
-        workspaceService.createWorkspace(workspace);
-        return "Workspace Created";
+    @PostMapping
+    public String createWorkspace(
+        @Valid
+        @RequestBody WorkspaceCreateRequest workspace){
+        // workspaceService.createWorkspace(workspace);
+        return workspaceService.createWorkspace(workspace);;
     }
     @GetMapping("/getSpace")
     public Workspace getWorkspace(@RequestParam String name){
         return workspaceService.getWorkspace(name);
     }
-    @GetMapping("/getAllSpace")
-    public List<Workspace> getAllWorkspace(){
+    @GetMapping
+    public List<WorkspaceSummary> getAllWorkspace(){
         return workspaceService.getAllWorkspace();
     }
-    @GetMapping("/getSpaceById")
-    public Workspace getWorkspaceById(@RequestParam Long id){
-        return workspaceService.getWorkspaceById(id);
+    @GetMapping("/{workspaceId}")
+    public WorkspaceSummary getWorkspaceById(@PathVariable Long workspaceId){
+        return workspaceService.getWorkspaceById(workspaceId);
     }
-    @GetMapping("/deleteSpaceById")
-    public String deleteById(@RequestParam Long id){
-        workspaceService.deleteWorkspace(id);
+    @DeleteMapping("/{workspaceId}")
+    public String deleteById(@PathVariable Long workspaceId){
+        workspaceService.deleteWorkspace(workspaceId);
         return "Workspace Deleted";
     }
     @PostMapping("/{workspaceId}/invite")

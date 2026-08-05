@@ -10,6 +10,8 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "request_query_params")
+
 public class RequestQueryParam {
 
     @Id

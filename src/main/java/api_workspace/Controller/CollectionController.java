@@ -8,6 +8,7 @@ import api_workspace.dto.workspace.InviteRequest;
 import api_workspace.dto.collection.CollectionSummaryResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 import java.util.List;
 
 
@@ -21,7 +22,9 @@ public class CollectionController{
 
     // Creating a new collection
     @PostMapping("/{workspaceId}/createCollection")
-    public String createCollection(@PathVariable Long workspaceId, @RequestBody Collection collection){
+    public String createCollection(
+        @Valid
+        @PathVariable Long workspaceId, @RequestBody Collection collection){
         collectionService.createCollection(workspaceId, collection);
         return "Collection Created";
     }

@@ -28,8 +28,30 @@ public class ApiExecutionService {
     private final RequestHeaderRepository requestHeaderRepository;
     private final RequestQueryParamRepository requestQueryParamRepository;
     private final ExecutionHistoryRepository executionHistoryRepository;
+    private final EnvironmentRepository environmentRepository;
+    private final EnvironmentVariableRepository environmentVariableRepository;
+    private final AuthorizationRepository authorizationRepository;
+    private final ActivityLogService activityLogService;
+    private final WorkspaceEventService workspaceEventService;
     private final WebClient webClient;
 
+    private String replaceVariables(
+        String text,
+        Map<String, String> variableMap) {
+                if (text == null) {
+
+                        return null;
+                }
+                for (Map.Entry<String, String> entry : variableMap.entrySet()) {
+
+                        text = text.replace(
+
+                                "{{" + entry.getKey() + "}}",
+
+                                entry.getValue());
+                }
+                return text;
+        }
     public ApiExecutionService(
             WorkspaceRepository workspaceRepository,
             CollectionRepository collectionRepository,
@@ -38,6 +60,11 @@ public class ApiExecutionService {
             RequestHeaderRepository requestHeaderRepository,
             RequestQueryParamRepository requestQueryParamRepository,
             ExecutionHistoryRepository executionHistoryRepository,
+            EnvironmentRepository environmentRepository,
+            EnvironmentVariableRepository environmentVariableRepository,
+            AuthorizationRepository authorizationRepository,
+            ActivityLogService activityLogService,
+            WorkspaceEventService workspaceEventService,
             WebClient webClient) {
 
         this.workspaceRepository = workspaceRepository;
@@ -47,13 +74,19 @@ public class ApiExecutionService {
         this.requestHeaderRepository = requestHeaderRepository;
         this.requestQueryParamRepository = requestQueryParamRepository;
         this.executionHistoryRepository = executionHistoryRepository;
+        this.environmentRepository = environmentRepository;
+        this.environmentVariableRepository = environmentVariableRepository;
+        this.authorizationRepository = authorizationRepository;
+        this.activityLogService = activityLogService;
+        this.workspaceEventService = workspaceEventService;
         this.webClient = webClient;
     }
 
     public ApiExecutionResponse executeRequest(
         Long workspaceId,
         Long collectionId,
-        Long requestId) {
+        Long requestId,
+        Long environmentId) {
 
         Authentication authentication =
                 SecurityContextHolder.getContext().getAuthentication();
@@ -84,9 +117,36 @@ public class ApiExecutionService {
                 throw new RuntimeException("User is not a workspace member");
         }
 
+        // Check environment present or not
+        Environment environment =
+        environmentRepository.findById(environmentId)
+                .orElseThrow(() ->
+                        new RuntimeException("Environment not found"));
+
+        if (!environment.getWorkspace().getId().equals(workspaceId)) {
+                throw new RuntimeException(
+                        "Environment does not belong to workspace");
+        }
+
+        // Variables
+        List<EnvironmentVariable> variables =
+        environmentVariableRepository.findByEnvironment(environment);
+        Map<String, String> variableMap = new HashMap<>();
+
+        for (EnvironmentVariable variable : variables) {
+                variableMap.put(
+
+                        variable.getVariableKey(),
+
+                        variable.getVariableValue()
+                );
+        }
+        System.out.println("Variable Map: " + variableMap);
         // Build URL
         UriComponentsBuilder builder =
-                UriComponentsBuilder.fromUriString(apiRequest.getUrl());
+                UriComponentsBuilder.fromUriString(replaceVariables(
+                                                apiRequest.getUrl(),
+                                                variableMap));
 
         List<RequestQueryParam> queryParams =
                 requestQueryParamRepository.findByApiRequest(apiRequest);
@@ -95,9 +155,15 @@ public class ApiExecutionService {
 
                 if (Boolean.TRUE.equals(param.getEnabled())) {
 
-                builder.queryParam(
-                        param.getParamKey(),
-                        param.getParamValue());
+                        builder.queryParam(
+                                replaceVariables(
+                                        param.getParamKey(),
+                                        variableMap),
+
+                                replaceVariables(
+                                        param.getParamValue(),
+                                        variableMap)
+                        );
                 }
         }
 
@@ -112,6 +178,22 @@ public class ApiExecutionService {
 
         long start = System.currentTimeMillis();
 
+        // Load authorization
+        Authorization authorization =
+                authorizationRepository.findByApiRequest(apiRequest);
+        if (authorization != null &&
+                authorization.getAuthType() == AuthType.API_KEY &&
+                "QUERY".equalsIgnoreCase(authorization.getApiKeyLocation())) {
+
+                builder.queryParam(
+
+                        authorization.getApiKeyName(),
+
+                        replaceVariables(
+                                authorization.getApiKey(),
+                                variableMap)
+                );
+        }
         WebClient.RequestHeadersSpec<?> requestSpec;
 
         if (method == HttpMethod.POST ||
@@ -121,7 +203,11 @@ public class ApiExecutionService {
                 requestSpec = webClient
                         .method(method)
                         .uri(builder.build().toUri())
-                        .bodyValue(apiRequest.getBody());
+                        .bodyValue(
+                                replaceVariables(
+                                        apiRequest.getBody(),
+                                        variableMap)
+                        );
 
         } else {
 
@@ -133,16 +219,59 @@ public class ApiExecutionService {
         List<RequestHeader> headers =
                 requestHeaderRepository.findByApiRequest(apiRequest);
 
+        
+
         requestSpec.headers(httpHeaders -> {
 
+                // Manual Headers
                 for (RequestHeader header : headers) {
-
-                if (Boolean.TRUE.equals(header.getEnabled())) {
-
+                        if (Boolean.TRUE.equals(header.getEnabled())) {
                         httpHeaders.add(
-                                header.getHeaderKey(),
-                                header.getHeaderValue());
+                                replaceVariables(
+                                        header.getHeaderKey(),
+                                        variableMap),
+
+                                replaceVariables(
+                                        header.getHeaderValue(),
+                                        variableMap)
+                        );
+                        }
                 }
+
+                // Authorization
+                if (authorization != null) {
+                        switch (authorization.getAuthType()) {
+                        case NONE:
+                                break;
+                        case BEARER:
+                                httpHeaders.setBearerAuth(
+                                        replaceVariables(
+                                                authorization.getBearerToken(),
+                                                variableMap)
+                                );
+                                break;
+                        case BASIC:
+                                httpHeaders.setBasicAuth(
+                                        replaceVariables(
+                                                authorization.getUsername(),
+                                                variableMap),
+                                        replaceVariables(
+                                                authorization.getPassword(),
+                                                variableMap)
+                                );
+                                break;
+                        case API_KEY:
+                                if ("HEADER".equalsIgnoreCase(
+                                        authorization.getApiKeyLocation())) {
+                                httpHeaders.add(
+                                        authorization.getApiKeyName(),
+                                        replaceVariables(
+                                                authorization.getApiKey(),
+                                                variableMap)
+                                );
+                                }
+                                break;
+                        }
                 }
         });
 
@@ -170,6 +299,22 @@ public class ApiExecutionService {
 
         executionHistoryRepository.save(history);
 
+        // Saving activity logs
+        activityLogService.logActivity(
+                workspace,
+                currentUser,
+                ActivityAction.EXECUTED,
+                ResourceType.REQUEST,
+                apiRequest.getName()
+        );
+
+        workspaceEventService.sendEvent(
+                workspace.getId(),
+                "REQUEST_EXECUTED",
+                "REQUEST",
+                apiRequest.getName(),
+                currentUser.getName()
+        );
         return new ApiExecutionResponse(
                 response.getStatusCode().value(),
                 response.getBody(),
