@@ -1,4 +1,4 @@
-package api_workspace.controller;
+package api_workspace.Controller;
 
 import api_workspace.dto.environment.*;
 import api_workspace.service.EnvironmentVariableService;
@@ -23,9 +23,8 @@ public class EnvironmentVariableController {
     // Create Variable
     @PostMapping("/{environmentId}/variables")
     public ResponseEntity<EnvironmentVariableResponse> createVariable(
-            @Valid
             @PathVariable Long environmentId,
-
+            @Valid
             @RequestBody CreateEnvironmentVariableRequest request) {
 
         return ResponseEntity.ok(

@@ -83,7 +83,8 @@ public class EnvironmentVariableService {
         return new EnvironmentVariableResponse(
                 saved.getId(),
                 saved.getVariableKey(),
-                saved.getVariableValue()
+                saved.getVariableValue(),
+                saved.getEnvironment().getId()
         );
     }
 
@@ -123,7 +124,8 @@ public class EnvironmentVariableService {
                     new EnvironmentVariableResponse(
                             variable.getId(),
                             variable.getVariableKey(),
-                            variable.getVariableValue()
+                            variable.getVariableValue(),
+                            variable.getEnvironment().getId()
                     )
             );
         }
@@ -179,7 +181,8 @@ public class EnvironmentVariableService {
         return new EnvironmentVariableResponse(
                 updated.getId(),
                 updated.getVariableKey(),
-                updated.getVariableValue()
+                updated.getVariableValue(),
+                updated.getEnvironment().getId()
         );
     }
 

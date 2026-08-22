@@ -10,4 +10,6 @@ public interface ExecutionHistoryRepository
 
     List<ExecutionHistory> findByApiRequestOrderByExecutedAtDesc(
             ApiRequest apiRequest);
+
+    void deleteByApiRequest(ApiRequest apiRequest);
 }

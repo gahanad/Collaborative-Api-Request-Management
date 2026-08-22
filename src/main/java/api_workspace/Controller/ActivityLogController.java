@@ -1,9 +1,12 @@
-package api_workspace.controller;
+package api_workspace.Controller;
 
 import api_workspace.dto.activity.ActivityLogResponse;
 import api_workspace.entity.Workspace;
+import api_workspace.enums.*;
 import api_workspace.repository.WorkspaceRepository;
 import api_workspace.service.ActivityLogService;
+import api_workspace.dto.activity.ActivityLogPageResponse;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,27 +17,49 @@ import java.util.List;
 public class ActivityLogController {
 
     private final ActivityLogService activityLogService;
-    private final WorkspaceRepository workspaceRepository;
 
     public ActivityLogController(
-            ActivityLogService activityLogService,
-            WorkspaceRepository workspaceRepository) {
+            ActivityLogService activityLogService) {
 
         this.activityLogService = activityLogService;
-        this.workspaceRepository = workspaceRepository;
     }
 
     @GetMapping("/{workspaceId}/activity")
-    public ResponseEntity<List<ActivityLogResponse>> getLogs(
-            @PathVariable Long workspaceId) {
+    public ResponseEntity<ActivityLogPageResponse> getLogs(
 
-        Workspace workspace =
-                workspaceRepository.findById(workspaceId)
-                        .orElseThrow(() ->
-                                new RuntimeException("Workspace not found"));
+            @PathVariable Long workspaceId,
+
+            @RequestParam(
+                    defaultValue = "0"
+            )
+            int page,
+
+            @RequestParam(
+                    defaultValue = "20"
+            )
+            int size,
+
+            @RequestParam(
+                    required = false
+            )
+            ActivityAction action,
+
+            @RequestParam(
+                    required = false
+            )
+            ResourceType resourceType
+    ) {
 
         return ResponseEntity.ok(
-                activityLogService.getActivityLogs(workspace)
+
+                activityLogService.getActivityLogs(
+                        workspaceId,
+                        page,
+                        size,
+                        action,
+                        resourceType
+                )
+
         );
     }
 }

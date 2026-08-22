@@ -1,12 +1,14 @@
-package api_workspace.controller;
+package api_workspace.Controller;
 
 import api_workspace.dto.request.ApiCreateRequest;
 import api_workspace.dto.request.ApiRequestSummaryResponse;
 import api_workspace.service.ApiRequestService;
+import api_workspace.dto.request.MoveRequestRequest;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import jakarta.validation.Valid;
 
 
 @RestController
@@ -25,7 +27,7 @@ public class ApiRequestController {
             @PathVariable Long workspaceId,
 
             @PathVariable Long collectionId,
-
+            @Valid
             @RequestBody ApiCreateRequest request) {
 
         return ResponseEntity.ok(
@@ -65,6 +67,7 @@ public class ApiRequestController {
         @PathVariable Long workspaceId,
         @PathVariable Long collectionId,
         @PathVariable Long requestId,
+        @Valid
         @RequestBody ApiCreateRequest request
     ){
         return ResponseEntity.ok(
@@ -98,5 +101,36 @@ public class ApiRequestController {
                         workspaceId,
                         collectionId,
                         requestId));
+    }
+
+    @PatchMapping(
+        "/{workspaceId}/collections/{collectionId}/requests/{requestId}/move")
+    public ResponseEntity<ApiRequestSummaryResponse> moveRequest(
+
+            @PathVariable Long workspaceId,
+
+            @PathVariable Long collectionId,
+
+            @PathVariable Long requestId,
+
+            @RequestBody MoveRequestRequest request
+
+    ) {
+
+        return ResponseEntity.ok(
+
+                apiRequestService.moveRequest(
+
+                        workspaceId,
+
+                        collectionId,
+
+                        requestId,
+
+                        request.getTargetCollectionId()
+
+                )
+
+        );
     }
 }

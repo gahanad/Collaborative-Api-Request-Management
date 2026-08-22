@@ -1,4 +1,4 @@
-package api_workspace.controller;
+package api_workspace.Controller;
 
 import api_workspace.dto.header.CreateHeaderRequest;
 import api_workspace.dto.header.HeaderResponse;

@@ -1,4 +1,4 @@
-package api_workspace.controller;
+package api_workspace.Controller;
 
 import api_workspace.dto.queryparam.CreateQueryParamRequest;
 import api_workspace.dto.queryparam.QueryParamResponse;

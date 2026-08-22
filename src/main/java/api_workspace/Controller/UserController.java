@@ -1,4 +1,4 @@
-package api_workspace.controller;
+package api_workspace.Controller;
 
 import api_workspace.entity.User;
 import api_workspace.repository.UserRepository;
@@ -6,7 +6,11 @@ import api_workspace.service.UserService;
 import api_workspace.dto.user.*;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
-import main.java.api_workspace.dto.user.LoginResponse;
+import api_workspace.dto.user.LoginResponse;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 
 
@@ -32,7 +36,16 @@ public class UserController{
     }
 
     @GetMapping("/test")
-    public String test(){
-        return "Protected API";
+    public ResponseEntity<Map<String, Object>> test() {
+        Map<String, Object> response = new HashMap<>();
+        response.put(
+                "message",
+                "Hello from API Workspace backend"
+        );
+        response.put(
+                "status",
+                "success"
+        );
+        return ResponseEntity.ok(response);
     }
 }

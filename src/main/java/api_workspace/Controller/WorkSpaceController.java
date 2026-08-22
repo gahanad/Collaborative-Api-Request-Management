@@ -1,4 +1,4 @@
-package api_workspace.controller;
+package api_workspace.Controller;
 
 import api_workspace.entity.Workspace;
 import api_workspace.repository.WorkspaceRepository;
@@ -7,6 +7,7 @@ import api_workspace.dto.workspace.*;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import jakarta.validation.Valid;
+import api_workspace.dto.workspace.WorkspaceDetailResponse;
 
 
 @RestController
@@ -17,22 +18,18 @@ public class WorkSpaceController{
         this.workspaceService = workspaceService;
     }
     @PostMapping
-    public String createWorkspace(
+    public WorkspaceSummary createWorkspace(
         @Valid
         @RequestBody WorkspaceCreateRequest workspace){
         // workspaceService.createWorkspace(workspace);
-        return workspaceService.createWorkspace(workspace);;
-    }
-    @GetMapping("/getSpace")
-    public Workspace getWorkspace(@RequestParam String name){
-        return workspaceService.getWorkspace(name);
+        return workspaceService.createWorkspace(workspace);
     }
     @GetMapping
     public List<WorkspaceSummary> getAllWorkspace(){
         return workspaceService.getAllWorkspace();
     }
     @GetMapping("/{workspaceId}")
-    public WorkspaceSummary getWorkspaceById(@PathVariable Long workspaceId){
+    public WorkspaceDetailResponse getWorkspaceById(@PathVariable Long workspaceId){
         return workspaceService.getWorkspaceById(workspaceId);
     }
     @DeleteMapping("/{workspaceId}")

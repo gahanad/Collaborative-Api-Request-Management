@@ -19,21 +19,25 @@ public class ActivityLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "workspace_id")
-    private Workspace workspace;
+    private Long workspaceId;
+
+    private String workspaceName;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private ActivityAction action;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private ResourceType resourceType;
 
+    @Column(nullable = false)
     private String resourceName;
 
+    @Column(nullable = false)
     private LocalDateTime createdAt;
 }

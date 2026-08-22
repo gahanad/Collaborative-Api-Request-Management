@@ -7,7 +7,7 @@ import api_workspace.repository.WorkspaceMemberRepository;
 import api_workspace.repository.WorkspaceRepository;
 import api_workspace.repository.UserRepository;
 import api_workspace.entity.User;
-import api_workspace.dto.collection.CollectionSummaryResponse;
+import api_workspace.dto.collection.*;
 import api_workspace.dto.user.UserSummary;
 import api_workspace.dto.workspace.WorkspaceSummary;
 import api_workspace.entity.Collection;
@@ -76,29 +76,32 @@ public class CollectionService{
     }
 
     // Creating a new collection
-    public void createCollection(Long workspaceId, Collection collection){
+    public void createCollection(Long workspaceId, CollectionCreateRequest request) {
         Authentication authentication =
                 SecurityContextHolder
                         .getContext()
                         .getAuthentication();
 
-        // Object principal = authentication.getPrincipal();
         User currentUser = (User) authentication.getPrincipal();
         Workspace existWorkspace = workspaceRepository.findById(workspaceId)
-                    .orElseThrow(() -> new RuntimeException("Workspace not found"));
-
-        WorkspaceMember workspaceMember = workspaceMemberRepository.findByWorkspaceAndUser(existWorkspace, currentUser);
-        if(workspaceMember == null) {
-                throw new RuntimeException("User is not a member of the workspace");
+                .orElseThrow(() -> new RuntimeException("Workspace not found"));
+        WorkspaceMember workspaceMember =
+                workspaceMemberRepository.findByWorkspaceAndUser(existWorkspace, currentUser);
+        if (workspaceMember == null) {
+            throw new RuntimeException("User is not a member of the workspace");
         }
-        if(workspaceMember.getRole().equals("VIEWER")){
+        if (workspaceMember.getRole() == WorkspaceRole.VIEWER) {
             throw new RuntimeException("User does not have permission to create a collection");
-        } else {
-            collection.setWorkspace(existWorkspace);
-            collection.setCreatedBy(currentUser);
-            collectionRepository.save(collection);
         }
-        // Saving activity logs
+        Collection collection = new Collection();
+
+        collection.setName(request.getName());
+        collection.setDescription(request.getDescription());
+
+        collection.setWorkspace(existWorkspace);
+        collection.setCreatedBy(currentUser);
+
+        collectionRepository.save(collection);
         activityLogService.logActivity(
                 existWorkspace,
                 currentUser,
@@ -106,13 +109,12 @@ public class CollectionService{
                 ResourceType.COLLECTION,
                 collection.getName()
         );
-
         workspaceEventService.sendEvent(
-            existWorkspace.getId(),
-            "COLLECTION_CREATED",
-            "COLLECTION",
-            collection.getName(),
-            currentUser.getName()
+                existWorkspace.getId(),
+                "COLLECTION_CREATED",
+                "COLLECTION",
+                collection.getName(),
+                currentUser.getName()
         );
     }
 
@@ -164,6 +166,53 @@ public class CollectionService{
             "COLLECTION",
             collection.getName(),
             currentUser.getName()
+        );
+    }
+
+    public void updateCollection(
+        Long collectionId,
+        CollectionCreateRequest request
+    ) {
+        Authentication authentication =
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication();
+        User currentUser = (User) authentication.getPrincipal();
+        Collection collection = collectionRepository.findById(collectionId)
+                .orElseThrow(() ->
+                        new RuntimeException("Collection not found"));
+        Workspace workspace = collection.getWorkspace();
+        WorkspaceMember workspaceMember =
+                workspaceMemberRepository.findByWorkspaceAndUser(
+                        workspace,
+                        currentUser
+                );
+        if (workspaceMember == null) {
+            throw new RuntimeException(
+                    "User is not a member of the workspace"
+            );
+        }
+        if (workspaceMember.getRole() == WorkspaceRole.VIEWER) {
+            throw new RuntimeException(
+                    "User does not have permission to update this collection"
+            );
+        }
+        collection.setName(request.getName());
+        collection.setDescription(request.getDescription());
+        collectionRepository.save(collection);
+        activityLogService.logActivity(
+                workspace,
+                currentUser,
+                ActivityAction.UPDATED,
+                ResourceType.COLLECTION,
+                collection.getName()
+        );
+        workspaceEventService.sendEvent(
+                workspace.getId(),
+                "COLLECTION_UPDATED",
+                "COLLECTION",
+                collection.getName(),
+                currentUser.getName()
         );
     }
 }

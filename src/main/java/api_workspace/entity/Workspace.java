@@ -31,6 +31,11 @@ public class Workspace{
     @JoinColumn(name = "created_by")
     private User createdBy;
 
-    @OneToMany(mappedBy = "workspace")
+    @OneToMany(
+        mappedBy = "workspace",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
     private List<WorkspaceMember> members;
+
 }

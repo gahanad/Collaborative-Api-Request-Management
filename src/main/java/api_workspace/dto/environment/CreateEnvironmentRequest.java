@@ -13,6 +13,4 @@ public class CreateEnvironmentRequest {
     @NotBlank(message = "Environment name is required")
     private String name;
 
-    @Size(max = 500)
-    private String description;
 }

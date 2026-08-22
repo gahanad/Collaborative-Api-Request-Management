@@ -12,12 +12,9 @@ import org.springframework.http.HttpHeaders;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ApiExecutionResponse {
-
     private int statusCode;
-
     private String body;
-
     private HttpHeaders headers;
-
     private long responseTime;
+    private long size;
 }

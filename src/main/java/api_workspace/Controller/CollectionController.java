@@ -1,13 +1,15 @@
-package api_workspace.controller;
+package api_workspace.Controller;
 
 import api_workspace.entity.Workspace;
 import api_workspace.service.WorkspaceService;
 import api_workspace.service.CollectionService;
 import api_workspace.entity.Collection;
 import api_workspace.dto.workspace.InviteRequest;
+import api_workspace.dto.collection.CollectionCreateRequest;
 import api_workspace.dto.collection.CollectionSummaryResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
 import jakarta.validation.Valid;
 import java.util.List;
 
@@ -22,11 +24,13 @@ public class CollectionController{
 
     // Creating a new collection
     @PostMapping("/{workspaceId}/createCollection")
-    public String createCollection(
-        @Valid
-        @PathVariable Long workspaceId, @RequestBody Collection collection){
-        collectionService.createCollection(workspaceId, collection);
-        return "Collection Created";
+    public ResponseEntity<Void> createCollection(
+        @PathVariable Long workspaceId,
+        @Valid 
+        @RequestBody CollectionCreateRequest request) {
+
+    collectionService.createCollection(workspaceId, request);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping("/{workspaceId}/getAllcollections")
@@ -42,5 +46,14 @@ public class CollectionController{
         collectionService.deleteCollection(collectionId);
 
         return "Collection deleted successfully";
+    }
+
+    @PutMapping("/{collectionId}")
+    public ResponseEntity<String> updateCollection(
+            @PathVariable Long collectionId,
+            @Valid @RequestBody CollectionCreateRequest request
+    ) {
+        collectionService.updateCollection(collectionId, request);
+        return ResponseEntity.ok("Collection updated successfully");
     }
 }

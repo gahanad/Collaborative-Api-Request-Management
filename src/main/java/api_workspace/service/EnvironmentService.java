@@ -59,6 +59,11 @@ public class EnvironmentService {
         if (member == null) {
             throw new RuntimeException("User is not a workspace member");
         }
+        if (member.getRole() == WorkspaceRole.VIEWER) {
+                throw new RuntimeException(
+                        "Viewers cannot create environments"
+                );
+        }
 
         Environment environment = new Environment();
 
@@ -86,7 +91,8 @@ public class EnvironmentService {
         );
         return new EnvironmentResponse(
                 saved.getId(),
-                saved.getName()
+                saved.getName(),
+                saved.getWorkspace().getId()
         );
     }
 
@@ -125,10 +131,9 @@ public class EnvironmentService {
             response.add(
 
                     new EnvironmentResponse(
-
                             env.getId(),
-
-                            env.getName()
+                            env.getName(),
+                            env.getWorkspace().getId()
                     )
             );
         }
@@ -139,7 +144,8 @@ public class EnvironmentService {
     // Update Environment
     public EnvironmentResponse updateEnvironment(
         Long environmentId,
-        UpdateEnvironmentRequest request) {
+        UpdateEnvironmentRequest request,
+        Long workspaceId) {
 
         Authentication authentication =
                 SecurityContextHolder.getContext().getAuthentication();
@@ -151,7 +157,15 @@ public class EnvironmentService {
                         new RuntimeException("Environment not found"));
 
         Workspace workspace = environment.getWorkspace();
+        if (environment.getWorkspace() == null ||
+                !environment.getWorkspace()
+                        .getId()
+                        .equals(workspaceId)) {
 
+        throw new RuntimeException(
+                "Environment does not belong to workspace"
+        );
+        }
         WorkspaceMember member =
                 workspaceMemberRepository.findByWorkspaceAndUser(
                         workspace,
@@ -160,6 +174,11 @@ public class EnvironmentService {
 
         if (member == null) {
             throw new RuntimeException("User is not a workspace member");
+        }
+        if (member.getRole() == WorkspaceRole.VIEWER) {
+                throw new RuntimeException(
+                        "Viewers cannot update environments"
+                );
         }
 
         environment.setName(request.getName());
@@ -185,13 +204,14 @@ public class EnvironmentService {
         );
         return new EnvironmentResponse(
                 updated.getId(),
-                updated.getName()
+                updated.getName(),
+                updated.getWorkspace().getId()
         );
     }
 
     // Delete Environment
     public void deleteEnvironment(
-        Long environmentId) {
+        Long environmentId, Long workspaceId) {
 
         Authentication authentication =
                 SecurityContextHolder.getContext().getAuthentication();
@@ -203,6 +223,15 @@ public class EnvironmentService {
                         new RuntimeException("Environment not found"));
 
         Workspace workspace = environment.getWorkspace();
+        if (environment.getWorkspace() == null ||
+        !environment.getWorkspace()
+                .getId()
+                .equals(workspaceId)) {
+
+                throw new RuntimeException(
+                        "Environment does not belong to workspace"
+                );
+        }
 
         WorkspaceMember member =
                 workspaceMemberRepository.findByWorkspaceAndUser(
@@ -213,8 +242,10 @@ public class EnvironmentService {
         if (member == null) {
             throw new RuntimeException("User is not a workspace member");
         }
-        if(member.getRole().equals("VIEWER")){
-            throw new RuntimeException("User does not have permission to delete the collection");
+        if (member.getRole() == WorkspaceRole.VIEWER) {
+                throw new RuntimeException(
+                        "User does not have permission to delete the environment"
+                );
         }
         environmentRepository.delete(environment);
 

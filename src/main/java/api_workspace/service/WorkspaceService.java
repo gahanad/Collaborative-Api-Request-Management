@@ -3,6 +3,7 @@ package api_workspace.service;
 import api_workspace.entity.Workspace;
 import api_workspace.repository.WorkspaceRepository;
 import api_workspace.service.*;
+import api_workspace.dto.workspace.WorkspaceDetailResponse;
 import api_workspace.entity.WorkspaceMember;
 import api_workspace.enums.WorkspaceRole;
 import api_workspace.repository.WorkspaceMemberRepository;
@@ -12,6 +13,7 @@ import api_workspace.entity.User;
 import api_workspace.enums.*;
 
 import org.springframework.security.core.Authentication;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -32,6 +34,16 @@ public class WorkspaceService{
         this.workspaceMemberRepository = workspaceMemberRepository;
         this.activityLogService = activityLogService;
         this.workspaceEventService = workspaceEventService;
+    }
+
+    private WorkspaceSummary convertToSummary(Workspace workspace){
+
+        WorkspaceSummary response = new WorkspaceSummary();
+        response.setId(workspace.getId());
+        response.setName(workspace.getName());
+        response.setDescription(workspace.getDescription());
+        response.setCreatedAt(workspace.getCreatedAt());
+        return response;
     }
     public WorkspaceSummary createWorkspace(WorkspaceCreateRequest request){
         Authentication authentication =
@@ -77,23 +89,38 @@ public class WorkspaceService{
             workspace.getName(),
             currentUser.getName()
         );
+
+        WorkspaceSummary response = new WorkspaceSummary();
+        response.setId(workspace.getId());
+        response.setName(workspace.getName());
+        response.setDescription(workspace.getDescription());
+        response.setCreatedAt(workspace.getCreatedAt());
+
+        return response;
     }
-    public Workspace getWorkspace(String name){
-        Workspace exists = workspaceRepository.findByName(name);
-        if(exists != null){
-            return exists;
-        }
-        return null;
+    
+    public List<WorkspaceSummary> getAllWorkspace(){
+        List<Workspace> workspaces = workspaceRepository.findAll();
+
+        return workspaces.stream()
+                .map(this::convertToSummary)
+                .toList();
     }
-    public List<Workspace> getAllWorkspace(){
-        return workspaceRepository.findAll();
-    }
-    public Workspace getWorkspaceById(Long id){
-        Workspace exists = workspaceRepository.findById(id)
-        .orElseThrow(() -> new RuntimeException ("Workspace not found"));
-        return exists;
+    public WorkspaceDetailResponse getWorkspaceById(Long id){
+        Workspace workspace = workspaceRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("Workspace not found"));
+
+        WorkspaceDetailResponse response = new WorkspaceDetailResponse();
+
+        response.setId(workspace.getId());
+        response.setName(workspace.getName());
+        response.setDescription(workspace.getDescription());
+        response.setCreatedAt(workspace.getCreatedAt());
+
+        return response;
     }
     // For deleting the workspace based on id 
+    @Transactional
     public void deleteWorkspace(Long id) {
 
         Authentication authentication =
@@ -103,6 +130,7 @@ public class WorkspaceService{
         User currentUser = (User) authentication.getPrincipal();
         Workspace workspace = workspaceRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Workspace not found"));
+        workspaceMemberRepository.deleteByWorkspace(workspace);
         // Log BEFORE deleting
         activityLogService.logActivity(
                 workspace,

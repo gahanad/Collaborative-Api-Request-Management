@@ -1,4 +1,4 @@
-package main.java.api_workspace.dto.user;
+package api_workspace.dto.user;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

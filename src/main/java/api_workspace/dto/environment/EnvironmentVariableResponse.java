@@ -16,4 +16,5 @@ public class EnvironmentVariableResponse {
     private String variableKey;
 
     private String variableValue;
+    private Long environmentId;
 }

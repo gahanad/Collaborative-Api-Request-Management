@@ -1,4 +1,4 @@
-package api_workspace.controller;
+package api_workspace.Controller;
 
 import api_workspace.dto.collectionRunner.CollectionRunnerResponse;
 import api_workspace.service.CollectionRunnerService;

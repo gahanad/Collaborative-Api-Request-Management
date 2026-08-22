@@ -1,4 +1,4 @@
-package api_workspace.controller;
+package api_workspace.Controller;
 
 import api_workspace.dto.environment.*;
 import api_workspace.service.EnvironmentService;
@@ -22,9 +22,8 @@ public class EnvironmentController {
     // Create Environment
     @PostMapping("/{workspaceId}/environments")
     public ResponseEntity<EnvironmentResponse> createEnvironment(
-            @Valid
             @PathVariable Long workspaceId,
-
+            @Valid
             @RequestBody CreateEnvironmentRequest request) {
 
         return ResponseEntity.ok(
@@ -47,28 +46,29 @@ public class EnvironmentController {
     }
 
     // Update Environment
-    @PutMapping("/environments/{environmentId}")
+    @PutMapping("/{workspaceId}/environments/{environmentId}")
     public ResponseEntity<EnvironmentResponse> updateEnvironment(
 
             @PathVariable Long environmentId,
+            @PathVariable Long workspaceId,
 
             @RequestBody UpdateEnvironmentRequest request) {
 
         return ResponseEntity.ok(
                 environmentService.updateEnvironment(
                         environmentId,
-                        request
+                        request, workspaceId
                 )
         );
     }
 
     // Delete Environment
-    @DeleteMapping("/environments/{environmentId}")
+    @DeleteMapping("/{workspaceId}/environments/{environmentId}")
     public ResponseEntity<String> deleteEnvironment(
-
+            @PathVariable Long workspaceId,
             @PathVariable Long environmentId) {
 
-        environmentService.deleteEnvironment(environmentId);
+        environmentService.deleteEnvironment(environmentId, workspaceId);
 
         return ResponseEntity.ok("Environment deleted successfully");
     }

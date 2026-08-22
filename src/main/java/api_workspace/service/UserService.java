@@ -2,7 +2,7 @@ package api_workspace.service;
 
 import api_workspace.entity.User;
 import api_workspace.repository.UserRepository;
-import main.java.api_workspace.dto.user.LoginResponse;
+import api_workspace.dto.user.LoginResponse;
 
 import org.springframework.stereotype.Service;
 import api_workspace.dto.user.*;

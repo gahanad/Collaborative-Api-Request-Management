@@ -1,4 +1,5 @@
 package api_workspace.dto.workspace;
+import api_workspace.dto.user.*;
 
 import lombok.Getter;
 import lombok.Setter;
