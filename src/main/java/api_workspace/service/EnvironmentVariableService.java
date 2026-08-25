@@ -1,8 +1,8 @@
 package api_workspace.service;
 
+import api_workspace.dto.collaboration.CollaborationEvent;
 import api_workspace.dto.environment.*;
 import api_workspace.entity.*;
-import api_workspace.enums.WorkspaceRole;
 import api_workspace.repository.*;
 import api_workspace.service.*;
 import api_workspace.enums.*;
@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,17 +22,20 @@ public class EnvironmentVariableService {
     private final EnvironmentVariableRepository environmentVariableRepository;
     private final WorkspaceMemberRepository workspaceMemberRepository;
     private final ActivityLogService activityLogService;
+    private final CollaborationService collaborationService;
 
     public EnvironmentVariableService(
             EnvironmentRepository environmentRepository,
             EnvironmentVariableRepository environmentVariableRepository,
             WorkspaceMemberRepository workspaceMemberRepository,
-            ActivityLogService activityLogService) {
+            ActivityLogService activityLogService,
+            CollaborationService collaborationService) {
 
         this.environmentRepository = environmentRepository;
         this.environmentVariableRepository = environmentVariableRepository;
         this.workspaceMemberRepository = workspaceMemberRepository;
         this.activityLogService = activityLogService;
+        this.collaborationService = collaborationService;
     }
 
     // Create Variable
@@ -72,6 +76,20 @@ public class EnvironmentVariableService {
         EnvironmentVariable saved =
                 environmentVariableRepository.save(variable);
 
+        collaborationService.publishEvent(
+                new CollaborationEvent(
+                        CollaborationEventType.VARIABLE_CREATED,
+                        workspace.getId(),
+                        ResourceType.VARIABLE,
+                        variable.getId(),
+                        variable.getVariableKey(),
+                        currentUser.getId(),
+                        currentUser.getName(),
+                        LocalDateTime.now(),
+                        null,
+                        null
+                )
+        );
         // Saving activity logs
         activityLogService.logActivity(
                 workspace,
@@ -170,6 +188,20 @@ public class EnvironmentVariableService {
         EnvironmentVariable updated =
                 environmentVariableRepository.save(variable);
 
+        collaborationService.publishEvent(
+                new CollaborationEvent(
+                        CollaborationEventType.VARIABLE_UPDATED,
+                        workspace.getId(),
+                        ResourceType.VARIABLE,
+                        variable.getId(),
+                        variable.getVariableKey(),
+                        currentUser.getId(),
+                        currentUser.getName(),
+                        LocalDateTime.now(),
+                        null,
+                        null
+                )
+        );
         // Saving activity logs
         activityLogService.logActivity(
                 workspace,
@@ -215,8 +247,23 @@ public class EnvironmentVariableService {
             throw new RuntimeException("Viewers cannot delete variables");
         }
 
+        String variableKey = variable.getVariableKey();
+        Long workspaceId = workspace.getId();
         environmentVariableRepository.delete(variable);
-
+        collaborationService.publishEvent(
+                new CollaborationEvent(
+                        CollaborationEventType.VARIABLE_DELETED,
+                        workspaceId,
+                        ResourceType.VARIABLE,
+                        variableId,
+                        variableKey,
+                        currentUser.getId(),
+                        currentUser.getName(),
+                        LocalDateTime.now(),
+                        null,
+                        null
+                )
+        );
         // Saving activity logs
         activityLogService.logActivity(
                 workspace,

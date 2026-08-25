@@ -5,20 +5,23 @@ import api_workspace.repository.CollectionRepository;
 import api_workspace.entity.WorkspaceMember;
 import api_workspace.repository.WorkspaceMemberRepository;
 import api_workspace.repository.WorkspaceRepository;
-import api_workspace.repository.UserRepository;
+// import api_workspace.repository.UserRepository;
 import api_workspace.entity.User;
+import api_workspace.dto.collaboration.CollaborationEvent;
 import api_workspace.dto.collection.*;
 import api_workspace.dto.user.UserSummary;
 import api_workspace.dto.workspace.WorkspaceSummary;
 import api_workspace.entity.Collection;
 import api_workspace.service.*;
 import api_workspace.enums.*;
+
 // import api_workspace.controller.CollectionController;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.*;
+// import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -29,6 +32,7 @@ public class CollectionService{
     private final WorkspaceRepository workspaceRepository;
     private final ActivityLogService activityLogService;
     private final WorkspaceEventService workspaceEventService;
+    private final CollaborationService collaborationService;
     private CollectionSummaryResponse convertToDTO(Collection collection) {
 
     // Create the main DTO
@@ -66,13 +70,15 @@ public class CollectionService{
     }
     public CollectionService(CollectionRepository collectionRepository, 
         WorkspaceEventService workspaceEventService,
-        WorkspaceMemberRepository workspaceMemberRepository, WorkspaceRepository workspaceRepository, ActivityLogService activityLogService){
+        WorkspaceMemberRepository workspaceMemberRepository, WorkspaceRepository workspaceRepository, ActivityLogService activityLogService,
+        CollaborationService collaborationService){
         // this.collectionController = collectionController;
         this.collectionRepository = collectionRepository;
         this.workspaceMemberRepository = workspaceMemberRepository;
         this.workspaceRepository = workspaceRepository;
         this.activityLogService = activityLogService;
         this.workspaceEventService = workspaceEventService;
+        this.collaborationService = collaborationService;
     }
 
     // Creating a new collection
@@ -102,6 +108,20 @@ public class CollectionService{
         collection.setCreatedBy(currentUser);
 
         collectionRepository.save(collection);
+        collaborationService.publishEvent(
+            new CollaborationEvent(
+                    CollaborationEventType.COLLECTION_CREATED,
+                    existWorkspace.getId(),
+                    ResourceType.COLLECTION,
+                    collection.getId(),
+                    collection.getName(),
+                    currentUser.getId(),
+                    currentUser.getName(),
+                    LocalDateTime.now(),
+                    null,
+                    null
+            )
+        );
         activityLogService.logActivity(
                 existWorkspace,
                 currentUser,
@@ -142,6 +162,12 @@ public class CollectionService{
         
         Workspace workspace = collection.getWorkspace();
         WorkspaceMember workspaceMember = workspaceMemberRepository.findByWorkspaceAndUser(workspace, currentUser);
+
+        String collectionName =
+                collection.getName();
+
+        Long workspaceId =
+                workspace.getId();
         if(workspaceMember == null)
         {
             throw new RuntimeException("User is not a member of the workspace");
@@ -151,6 +177,21 @@ public class CollectionService{
         } else {
             collectionRepository.delete(collection);
         }
+
+        collaborationService.publishEvent(
+            new CollaborationEvent(
+                    CollaborationEventType.COLLECTION_DELETED,
+                    workspaceId,
+                    ResourceType.COLLECTION,
+                    collectionId,
+                    collectionName,
+                    currentUser.getId(),
+                    currentUser.getName(),
+                    LocalDateTime.now(),
+                    null,
+                    null
+            )
+        );
         // Saving activity logs
         activityLogService.logActivity(
                 workspace,
@@ -200,6 +241,21 @@ public class CollectionService{
         collection.setName(request.getName());
         collection.setDescription(request.getDescription());
         collectionRepository.save(collection);
+
+        collaborationService.publishEvent(
+            new CollaborationEvent(
+                    CollaborationEventType.COLLECTION_UPDATED,
+                    workspace.getId(),
+                    ResourceType.COLLECTION,
+                    collection.getId(),
+                    collection.getName(),
+                    currentUser.getId(),
+                    currentUser.getName(),
+                    LocalDateTime.now(),
+                    null,
+                    null
+            )
+        );
         activityLogService.logActivity(
                 workspace,
                 currentUser,
@@ -215,4 +271,6 @@ public class CollectionService{
                 currentUser.getName()
         );
     }
+
+    
 }

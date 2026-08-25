@@ -1,5 +1,6 @@
 package api_workspace.service;
 
+import api_workspace.dto.collaboration.CollaborationEvent;
 import api_workspace.dto.environment.*;
 import api_workspace.entity.*;
 import api_workspace.repository.*;
@@ -10,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,19 +23,22 @@ public class EnvironmentService {
     private final EnvironmentRepository environmentRepository;
     private final ActivityLogService activityLogService;
     private final WorkspaceEventService workspaceEventService;
+    private final CollaborationService collaborationService;
 
     public EnvironmentService(
             WorkspaceRepository workspaceRepository,
             WorkspaceMemberRepository workspaceMemberRepository,
             EnvironmentRepository environmentRepository,
             WorkspaceEventService workspaceEventService,
-            ActivityLogService activityLogService) {
+            ActivityLogService activityLogService,
+            CollaborationService collaborationService) {
 
         this.workspaceRepository = workspaceRepository;
         this.workspaceMemberRepository = workspaceMemberRepository;
         this.environmentRepository = environmentRepository;
         this.activityLogService = activityLogService;
         this.workspaceEventService = workspaceEventService;
+        this.collaborationService = collaborationService;
     }
 
     // Create Environment
@@ -73,6 +78,20 @@ public class EnvironmentService {
         Environment saved =
                 environmentRepository.save(environment);
 
+        collaborationService.publishEvent(
+                new CollaborationEvent(
+                        CollaborationEventType.ENVIRONMENT_CREATED,
+                        workspace.getId(),
+                        ResourceType.ENVIRONMENT,
+                        environment.getId(),
+                        environment.getName(),
+                        currentUser.getId(),
+                        currentUser.getName(),
+                        LocalDateTime.now(),
+                        null,
+                        null
+                )
+        );
         // Saving activity logs
         activityLogService.logActivity(
                 workspace,
@@ -186,6 +205,21 @@ public class EnvironmentService {
         Environment updated =
                 environmentRepository.save(environment);
 
+        collaborationService.publishEvent(
+                new CollaborationEvent(
+                        CollaborationEventType.ENVIRONMENT_UPDATED,
+                        workspace.getId(),
+                        ResourceType.ENVIRONMENT,
+                        environment.getId(),
+                        environment.getName(),
+                        currentUser.getId(),
+                        currentUser.getName(),
+                        LocalDateTime.now(),
+                        null,
+                        null
+                )
+        );
+
         // Saving activity logs
         activityLogService.logActivity(
                 workspace,
@@ -247,8 +281,23 @@ public class EnvironmentService {
                         "User does not have permission to delete the environment"
                 );
         }
+        String environmentName = environment.getName();
         environmentRepository.delete(environment);
 
+        collaborationService.publishEvent(
+                new CollaborationEvent(
+                        CollaborationEventType.ENVIRONMENT_DELETED,
+                        workspaceId,
+                        ResourceType.ENVIRONMENT,
+                        environmentId,
+                        environmentName,
+                        currentUser.getId(),
+                        currentUser.getName(),
+                        LocalDateTime.now(),
+                        null,
+                        null
+                )
+        );
         // Saving activity logs
         activityLogService.logActivity(
                 workspace,

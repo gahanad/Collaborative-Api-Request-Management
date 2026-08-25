@@ -7,16 +7,16 @@ import api_workspace.dto.user.UserSummary;
 import api_workspace.dto.collection.CollectionSummaryResponse;
 import api_workspace.dto.workspace.WorkspaceSummary;
 import api_workspace.entity.*;
-import api_workspace.enums.WorkspaceRole;
 import api_workspace.repository.*;
-import api_workspace.repository.CollectionRepository;
 import api_workspace.service.*;
 import api_workspace.enums.*;
+import api_workspace.dto.collaboration.*;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 // import java.util.Collection;
 import java.util.List;
 
@@ -31,10 +31,13 @@ public class ApiRequestService {
     private final ActivityLogService activityLogService;
     private final AuthorizationRepository authorizationRepository;
     private final WorkspaceEventService workspaceEventService;
+    private final CollaborationService collaborationService;
 
 
 
-    public ApiRequestService(ApiRequestRepository apiRequestRepository, CollectionRepository collectionRepository, WorkspaceMemberRepository workspaceMemberRepository, WorkspaceRepository workspaceRepository, ActivityLogService activityLogService, AuthorizationRepository authorizationRepository, WorkspaceEventService workspaceEventService) {
+    public ApiRequestService(ApiRequestRepository apiRequestRepository, CollectionRepository collectionRepository, WorkspaceMemberRepository workspaceMemberRepository, WorkspaceRepository workspaceRepository, ActivityLogService activityLogService, AuthorizationRepository authorizationRepository, WorkspaceEventService workspaceEventService,
+        CollaborationService collaborationService
+    ) {
         this.apiRequestRepository = apiRequestRepository;
         this.collectionRepository = collectionRepository;
         this.workspaceMemberRepository = workspaceMemberRepository;
@@ -42,6 +45,7 @@ public class ApiRequestService {
         this.activityLogService = activityLogService;
         this.authorizationRepository = authorizationRepository;
         this.workspaceEventService = workspaceEventService;
+        this.collaborationService = collaborationService;
     }
 
     private ApiRequestSummaryResponse convertToDTO(ApiRequest apiRequest) {
@@ -181,6 +185,21 @@ public class ApiRequestService {
         authorization.setApiKeyLocation(request.getApiKeyLocation());
 
         authorizationRepository.save(authorization);
+
+        collaborationService.publishEvent(
+                new CollaborationEvent(
+                        CollaborationEventType.REQUEST_CREATED,
+                        workspace.getId(),
+                        ResourceType.REQUEST,
+                        apiRequest.getId(),
+                        apiRequest.getName(),
+                        currentUser.getId(),
+                        currentUser.getName(),
+                        LocalDateTime.now(),
+                        null,
+                        null
+                )
+        );
 
         // Saving activity logs
         activityLogService.logActivity(
@@ -592,7 +611,20 @@ public class ApiRequestService {
                 currentUser.getName()
         );
 
-
+        collaborationService.publishEvent(
+                new CollaborationEvent(
+                        CollaborationEventType.REQUEST_UPDATED,
+                        existsWorkspace.getId(),
+                        ResourceType.REQUEST,
+                        updatedRequest.getId(),
+                        updatedRequest.getName(),
+                        currentUser.getId(),
+                        currentUser.getName(),
+                        LocalDateTime.now(),
+                        null,
+                        null
+                )
+        );
         // ==========================================
         // Response
         // ==========================================
@@ -645,7 +677,26 @@ public class ApiRequestService {
             throw new RuntimeException("You do not have permission to delete this request");
         }
 
+        String requestName =
+                existsRequest.getName();
+
+
         apiRequestRepository.delete(existsRequest);
+
+        collaborationService.publishEvent(
+                new CollaborationEvent(
+                        CollaborationEventType.REQUEST_DELETED,
+                        workspaceId,
+                        ResourceType.REQUEST,
+                        requestId,
+                        requestName,
+                        currentUser.getId(),
+                        currentUser.getName(),
+                        LocalDateTime.now(),
+                        null,
+                        null
+                )
+        );
 
         // Saving activity logs
         activityLogService.logActivity(
@@ -725,6 +776,21 @@ public class ApiRequestService {
         duplicateRequest.setCreatedBy(currentUser);
 
         ApiRequest savedRequest = apiRequestRepository.save(duplicateRequest);
+
+        collaborationService.publishEvent(
+                new CollaborationEvent(
+                        CollaborationEventType.REQUEST_CREATED,
+                        existsWorkspace.getId(),
+                        ResourceType.REQUEST,
+                        duplicateRequest.getId(),
+                        duplicateRequest.getName(),
+                        currentUser.getId(),
+                        currentUser.getName(),
+                        LocalDateTime.now(),
+                        null,
+                        null
+                )
+        );
 
         workspaceEventService.sendEvent(
             existsWorkspace.getId(),
@@ -873,6 +939,20 @@ public class ApiRequestService {
                         existsRequest
                 );
 
+        collaborationService.publishEvent(
+                new CollaborationEvent(
+                        CollaborationEventType.REQUEST_MOVED,
+                        existsWorkspace.getId(),
+                        ResourceType.REQUEST,
+                        existsRequest.getId(),
+                        existsRequest.getName(),
+                        currentUser.getId(),
+                        currentUser.getName(),
+                        LocalDateTime.now(),
+                        sourceCollectionId,
+                        targetCollectionId
+                )
+        );
         // Activity Log
         activityLogService.logActivity(
                 existsWorkspace,
