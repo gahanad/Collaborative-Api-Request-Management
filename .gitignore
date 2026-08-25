@@ -1,33 +1,48 @@
-HELP.md
-target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+# ==============================
+# Dependencies
+# ==============================
+**/node_modules/
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
+# ==============================
+# Build output
+# ==============================
+**/target/
+**/dist/
+**/dist-ssr/
 
-### IntelliJ IDEA ###
-.idea
-*.iws
+# ==============================
+# Environment files
+# ==============================
+.env
+.env.*
+!.env.example
+
+# ==============================
+# Java / Maven
+# ==============================
+**/.mvn/wrapper/maven-wrapper.jar
+
+# ==============================
+# IDE
+# ==============================
+.idea/
+.vscode/
 *.iml
+*.iws
 *.ipr
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
+# ==============================
+# Logs
+# ==============================
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 
-### VS Code ###
-.vscode/
+# ==============================
+# Local files
+# ==============================
+Project_summary.png
+api-workspace.zip
+thread.cpp
