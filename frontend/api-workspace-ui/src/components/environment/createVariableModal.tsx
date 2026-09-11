@@ -285,7 +285,7 @@ export default function CreateVariableModal({
 
                         }}
                         onKeyDown={handleKeyDown}
-                        placeholder="http://localhost:8080"
+                        placeholder={import.meta.env.VITE_API_BASE_URL}
                         className="
                             w-full
                             rounded-md

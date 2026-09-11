@@ -33,7 +33,7 @@ public class WorkspaceEventService {
         );
 
         messagingTemplate.convertAndSend(
-                "/topic/workspace/" + workspaceId,
+                "/topic/workspaces/" + workspaceId,
                 event
         );
     }
@@ -47,7 +47,7 @@ public class WorkspaceEventService {
                                 .getOnlineUsers(workspaceId)
                 );
         messagingTemplate.convertAndSend(
-                "/topic/workspace/"
+                "/topic/workspaces/"
                         + workspaceId
                         + "/online-users",
 
@@ -59,7 +59,7 @@ public class WorkspaceEventService {
         EditingRequest request){
         messagingTemplate.convertAndSend(
 
-                "/topic/workspace/"
+                "/topic/workspaces/"
                         + request.getWorkspaceId()
                         + "/editing",
 
@@ -80,7 +80,7 @@ public class WorkspaceEventService {
                 );
 
         messagingTemplate.convertAndSend(
-                "/topic/workspace/"
+                "/topic/workspaces/"
                         + session.getWorkspaceId()
                         + "/editing",
 

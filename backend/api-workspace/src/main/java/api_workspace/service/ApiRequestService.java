@@ -30,12 +30,11 @@ public class ApiRequestService {
     private final WorkspaceRepository workspaceRepository;
     private final ActivityLogService activityLogService;
     private final AuthorizationRepository authorizationRepository;
-    private final WorkspaceEventService workspaceEventService;
     private final CollaborationService collaborationService;
 
 
 
-    public ApiRequestService(ApiRequestRepository apiRequestRepository, CollectionRepository collectionRepository, WorkspaceMemberRepository workspaceMemberRepository, WorkspaceRepository workspaceRepository, ActivityLogService activityLogService, AuthorizationRepository authorizationRepository, WorkspaceEventService workspaceEventService,
+    public ApiRequestService(ApiRequestRepository apiRequestRepository, CollectionRepository collectionRepository, WorkspaceMemberRepository workspaceMemberRepository, WorkspaceRepository workspaceRepository, ActivityLogService activityLogService, AuthorizationRepository authorizationRepository,
         CollaborationService collaborationService
     ) {
         this.apiRequestRepository = apiRequestRepository;
@@ -44,7 +43,6 @@ public class ApiRequestService {
         this.workspaceRepository = workspaceRepository;
         this.activityLogService = activityLogService;
         this.authorizationRepository = authorizationRepository;
-        this.workspaceEventService = workspaceEventService;
         this.collaborationService = collaborationService;
     }
 
@@ -196,7 +194,7 @@ public class ApiRequestService {
                         currentUser.getId(),
                         currentUser.getName(),
                         LocalDateTime.now(),
-                        null,
+                        collection.getId(),
                         null
                 )
         );
@@ -208,13 +206,6 @@ public class ApiRequestService {
                 ActivityAction.CREATED,
                 ResourceType.REQUEST,
                 apiRequest.getName()
-        );
-        workspaceEventService.sendEvent(
-            workspace.getId(),
-            "REQUEST_CREATED",
-            "REQUEST",
-            apiRequest.getName(),
-            currentUser.getName()
         );
         // Convert to DTO and return
         return convertToDTO(savedApiRequest);
@@ -603,14 +594,6 @@ public class ApiRequestService {
         // WebSocket Event
         // ==========================================
 
-        workspaceEventService.sendEvent(
-                existsWorkspace.getId(),
-                "REQUEST_UPDATED",
-                "REQUEST",
-                existsRequest.getName(),
-                currentUser.getName()
-        );
-
         collaborationService.publishEvent(
                 new CollaborationEvent(
                         CollaborationEventType.REQUEST_UPDATED,
@@ -621,7 +604,7 @@ public class ApiRequestService {
                         currentUser.getId(),
                         currentUser.getName(),
                         LocalDateTime.now(),
-                        null,
+                        existsRequest.getCollection().getId(),
                         null
                 )
         );
@@ -680,6 +663,9 @@ public class ApiRequestService {
         String requestName =
                 existsRequest.getName();
 
+        Long sourceCollectionId =
+                existsRequest.getCollection().getId();
+
 
         apiRequestRepository.delete(existsRequest);
 
@@ -693,7 +679,7 @@ public class ApiRequestService {
                         currentUser.getId(),
                         currentUser.getName(),
                         LocalDateTime.now(),
-                        null,
+                        sourceCollectionId,
                         null
                 )
         );
@@ -707,13 +693,6 @@ public class ApiRequestService {
                 existsRequest.getName()
         );
 
-        workspaceEventService.sendEvent(
-            existsWorkspace.getId(),
-            "REQUEST_DELETED",
-            "REQUEST",
-            existsRequest.getName(),
-            currentUser.getName()
-        );
         return "Request deleted successfully";
     }
 
@@ -787,17 +766,9 @@ public class ApiRequestService {
                         currentUser.getId(),
                         currentUser.getName(),
                         LocalDateTime.now(),
-                        null,
+                        existsCollection.getId(),
                         null
                 )
-        );
-
-        workspaceEventService.sendEvent(
-            existsWorkspace.getId(),
-            "REQUEST_DUPLICATED",
-            "REQUEST",
-            existsRequest.getName(),
-            currentUser.getName()
         );
 
         return convertToDTO(savedRequest);
@@ -960,15 +931,6 @@ public class ApiRequestService {
                 ActivityAction.UPDATED,
                 ResourceType.REQUEST,
                 existsRequest.getName()
-        );
-
-        // WebSocket Event
-        workspaceEventService.sendEvent(
-                existsWorkspace.getId(),
-                "REQUEST_MOVED",
-                "REQUEST",
-                existsRequest.getName(),
-                currentUser.getName()
         );
 
         // Return

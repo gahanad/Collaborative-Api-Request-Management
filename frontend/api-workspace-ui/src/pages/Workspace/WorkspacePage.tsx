@@ -143,7 +143,12 @@ console.log(
             "VARIABLE"
         ) {
 
-            fetchEnvironments(id);
+            // When variables change, fetch the variables for the
+            // currently selected environment if one is selected.
+            const currentEnvId = useEnvironmentStore.getState().selectedEnvironment?.id;
+            if (currentEnvId) {
+                useEnvironmentStore.getState().fetchVariables(currentEnvId);
+            }
 
             return;
         }

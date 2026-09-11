@@ -65,7 +65,7 @@ public class WebSocketConfig
         registry
                 .addEndpoint("/ws")
                 .setAllowedOriginPatterns(
-                        "http://localhost:5173"
+                        "*"
                 )
                 .withSockJS();
     }
