@@ -52,94 +52,94 @@ A full-stack collaborative API development platform for creating, organizing, ex
 ```
 
 🛠️ Tech Stack
-    Frontend
-    React
-    TypeScript
-    Vite
-    Tailwind CSS
-    Axios
-    STOMP.js
-    SockJS
+Frontend
+React
+TypeScript
+Vite
+Tailwind CSS
+Axios
+STOMP.js
+SockJS
 Backend
-    Java 21
-    Spring Boot
-    Spring Security
-    Spring Data JPA
-    JWT
-    BCrypt
-    Spring WebClient
-    WebSocket / STOMP
-    Maven
+Java 21
+Spring Boot
+Spring Security
+Spring Data JPA
+JWT
+BCrypt
+Spring WebClient
+WebSocket / STOMP
+Maven
 Database & Infrastructure
-    PostgreSQL
-    Supabase
-    Docker
+PostgreSQL
+Supabase
+Docker
 Deployment
-    Vercel — Frontend
-    Render — Backend
-    Supabase — Database
+Vercel — Frontend
+Render — Backend
+Supabase — Database
 📂 Project Structure
-    API_Workspace/
-    │
-    ├── backend/
-    │   └── api-workspace/
-    │       ├── src/
-    │       ├── pom.xml
-    │       ├── mvnw
-    │       ├── mvnw.cmd
-    │       └── Dockerfile
-    │
-    ├── frontend/
-    │   └── api-workspace-ui/
-    │       ├── src/
-    │       ├── package.json
-    │       └── vite.config.ts
-    │
-    └── README.md
+API_Workspace/
+│
+├── backend/
+│   └── api-workspace/
+│       ├── src/
+│       ├── pom.xml
+│       ├── mvnw
+│       ├── mvnw.cmd
+│       └── Dockerfile
+│
+├── frontend/
+│   └── api-workspace-ui/
+│       ├── src/
+│       ├── package.json
+│       └── vite.config.ts
+│
+└── README.md
 🔐 Authentication
 
-  The application uses JWT-based authentication.
-  
-  User Registration
-         ↓
-  Password hashed using BCrypt
-         ↓
-  User Login
-         ↓
-  JWT generated
-         ↓
-  JWT sent with API requests
-         ↓
-  JWT authentication filter
-       ↓
-  Protected resources
-  
-  Passwords are never stored in plain text.
+The application uses JWT-based authentication.
+
+User Registration
+     ↓
+Password hashed using BCrypt
+     ↓
+User Login
+     ↓
+JWT generated
+     ↓
+JWT sent with API requests
+     ↓
+JWT authentication filter
+   ↓
+Protected resources
+
+Passwords are never stored in plain text.
 
 👥 Workspace & Collaboration
 
-  Users can create workspaces and manage workspace members.
-  
-  Workspace functionality includes:
-  
-  Workspace creation
-  Member management
-  Role-based workspace access
-  In-app member invitations
-  Invitation acceptance/rejection
-  Workspace activity tracking
+Users can create workspaces and manage workspace members.
+
+Workspace functionality includes:
+
+Workspace creation
+Member management
+Role-based workspace access
+In-app member invitations
+Invitation acceptance/rejection
+Workspace activity tracking
 
 Real-time collaboration is implemented using Spring WebSocket with STOMP and SockJS.
 
-  Client
-    ↓
-  STOMP / SockJS
-    ↓
-  Spring WebSocket
-    ↓
-  Workspace Topic
-    ↓
-  Connected Workspace Members
+Client
+  ↓
+STOMP / SockJS
+  ↓
+Spring WebSocket
+  ↓
+Workspace Topic
+  ↓
+Connected Workspace Members
   
 📁 API Request Management
 
