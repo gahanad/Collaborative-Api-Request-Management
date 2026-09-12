@@ -19,7 +19,7 @@ import {
 import ActiveCollaborators
     from "../../components/collaboration/activeCollaborators";
 import { useState } from "react";
-import InviteModal from "../../components/workspace/InviteModal";
+import InviteModal from "../../components/workspace/invitesModal";
 export default function WorkspacePage(){
     const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
     const {
