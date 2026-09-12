@@ -3,14 +3,14 @@ package api_workspace.service;
 import api_workspace.entity.Workspace;
 import api_workspace.repository.WorkspaceRepository;
 import api_workspace.service.*;
-import api_workspace.dto.workspace.WorkspaceDetailResponse;
 import api_workspace.entity.WorkspaceMember;
-import api_workspace.enums.WorkspaceRole;
 import api_workspace.repository.WorkspaceMemberRepository;
 import api_workspace.dto.workspace.*;
 import api_workspace.repository.UserRepository;
+import api_workspace.repository.WorkspaceInviteRepository;
 import api_workspace.entity.User;
 import api_workspace.enums.*;
+import api_workspace.entity.WorkspaceInvite;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,14 +26,17 @@ public class WorkspaceService{
     private final WorkspaceMemberRepository workspaceMemberRepository;
     private final ActivityLogService activityLogService;
     private final WorkspaceEventService workspaceEventService;
+    private final WorkspaceInviteRepository workspaceInviteRepository;
+
     public WorkspaceService(WorkspaceRepository workspaceRepository, 
         WorkspaceEventService workspaceEventService,
-        UserRepository userRepository, WorkspaceMemberRepository workspaceMemberRepository, ActivityLogService activityLogService){
+        UserRepository userRepository, WorkspaceMemberRepository workspaceMemberRepository, ActivityLogService activityLogService, WorkspaceInviteRepository workspaceInviteRepository){
         this.workspaceRepository = workspaceRepository;
         this.userRepository = userRepository;
         this.workspaceMemberRepository = workspaceMemberRepository;
         this.activityLogService = activityLogService;
         this.workspaceEventService = workspaceEventService;
+        this.workspaceInviteRepository = workspaceInviteRepository;
     }
 
     private WorkspaceSummary convertToSummary(Workspace workspace){
@@ -151,62 +154,45 @@ public class WorkspaceService{
     }
 
     // Inviting User to Workspace
+        // Inviting User to Workspace (Changed to Invitation Request System)
     public String inviteMember(Long workspaceId, InviteRequest inviteRequest){
-        Authentication authentication =
-                SecurityContextHolder
-                        .getContext()
-                        .getAuthentication();
-
-        // Object principal = authentication.getPrincipal();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = (User) authentication.getPrincipal();
         Workspace workspace = workspaceRepository.findById(workspaceId)
                 .orElseThrow(() -> new RuntimeException("Workspace not found"));
+                
         WorkspaceMember existMember = workspaceMemberRepository.findByWorkspaceAndUser(workspace, currentUser);
-        if(existMember == null){
-            throw new RuntimeException(
-                    "You are not a member of this workspace"
-            );
-        }
-
-        if(existMember.getRole() != WorkspaceRole.ADMIN){
-            throw new RuntimeException(
-                    "Only ADMIN can invite users"
-            );
+        if(existMember == null || existMember.getRole() != WorkspaceRole.ADMIN){
+            throw new RuntimeException("Only ADMIN can invite users");
         }
 
         User userToInvite = userRepository.findByEmail(inviteRequest.getEmail());
         if(userToInvite == null){
-            throw new RuntimeException(
-                    "User not found"
-            );
+            throw new RuntimeException("User not found");
         }
 
-        WorkspaceMember existing =
-                workspaceMemberRepository
-                        .findByWorkspaceAndUser(
-                                workspace,
-                                userToInvite
-                        );
-
+        WorkspaceMember existing = workspaceMemberRepository.findByWorkspaceAndUser(workspace, userToInvite);
         if(existing != null){
-            throw new RuntimeException(
-                    "User already exists in workspace"
-            );
+            throw new RuntimeException("User already exists in workspace");
         }
 
-        WorkspaceMember member = new WorkspaceMember();
-        member.setWorkspace(workspace);
-        member.setUser(userToInvite);
-        member.setRole(inviteRequest.getRole());
-        workspaceMemberRepository.save(member);
+        // Check if a pending invite already exists
+        java.util.Optional<api_workspace.entity.WorkspaceInvite> pendingInvite = 
+            workspaceInviteRepository.findByWorkspaceAndInvitedUserAndStatus(
+                workspace, userToInvite, api_workspace.enums.InviteStatus.PENDING
+            );
+            
+        if (pendingInvite.isPresent()) {
+            throw new RuntimeException("A pending invitation already exists for this user");
+        }
+
+        WorkspaceInvite invite = new WorkspaceInvite();
+        invite.setWorkspace(workspace);
+        invite.setInvitedUser(userToInvite);
+        invite.setInvitedBy(currentUser);
+        invite.setRole(inviteRequest.getRole());
+        workspaceInviteRepository.save(invite);
         
-        workspaceEventService.sendEvent(
-            workspace.getId(),
-            "MEMBER_JOINED",
-            "MEMBER",
-            member.getUser().getName(),
-            currentUser.getName()
-        );
-        return "User invited successfully";
+        return "Invitation sent successfully";
     }
 }

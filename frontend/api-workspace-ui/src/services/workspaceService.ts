@@ -12,6 +12,20 @@ import type{
 
 from "../types/workspace";
 
+export interface InviteRequest {
+    email: string;
+    role: "ADMIN" | "EDITOR" | "VIEWER";
+}
+
+export interface WorkspaceInviteResponse {
+    id: number;
+    workspaceName: string;
+    invitedByName: string;
+    role: string;
+    status: string;
+    createdAt: string;
+}
+
 const workspaceService = {
 
     async getAllWorkspaces():
@@ -102,6 +116,23 @@ const workspaceService = {
 
         );
 
+    },
+    // For invite requests
+    inviteUser: async (workspaceId: number, data: InviteRequest): Promise<string> => {
+        const response = await api.post(`/workspaces/${workspaceId}/invite`, data);
+        return response.data;
+    },
+    getMyInvites: async (): Promise<WorkspaceInviteResponse[]> => {
+        const response = await api.get('/workspace-invites');
+        return response.data;
+    },
+    acceptInvite: async (inviteId: number): Promise<string> => {
+        const response = await api.post(`/workspace-invites/${inviteId}/accept`);
+        return response.data;
+    },
+    rejectInvite: async (inviteId: number): Promise<string> => {
+        const response = await api.post(`/workspace-invites/${inviteId}/reject`);
+        return response.data;
     }
 
 };

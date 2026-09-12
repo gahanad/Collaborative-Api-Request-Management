@@ -44,11 +44,16 @@ interface WorkspaceState{
 
     clearSelectedWorkspace:()=>void;
 
+    invitations: any[];
+    fetchInvitations: () => Promise<void>;
+    acceptInvitation: (inviteId: number) => Promise<void>;
+    rejectInvitation: (inviteId: number) => Promise<void>;
+
 }
 
 export const useWorkspaceStore =
 
-create<WorkspaceState>((set)=>({
+create<WorkspaceState>((set, get)=>({
 
     workspaces:[],
 
@@ -181,7 +186,37 @@ create<WorkspaceState>((set)=>({
 
         });
 
-    }
+    },
+        invitations: [],
+
+    fetchInvitations: async () => {
+        try {
+            const data = await workspaceService.getMyInvites();
+            set({ invitations: data });
+        } catch (error) {
+            console.error("Failed to fetch invitations:", error);
+        }
+    },
+
+    acceptInvitation: async (inviteId) => {
+        try {
+            await workspaceService.acceptInvite(inviteId);
+            await get().fetchInvitations(); // Refresh invites
+            await get().fetchWorkspaces();  // Refresh dashboard to show new workspace
+            alert("Invitation accepted!");
+        } catch (error: any) {
+            alert(error.response?.data?.message || "Failed to accept invitation");
+        }
+    },
+
+    rejectInvitation: async (inviteId) => {
+        try {
+            await workspaceService.rejectInvite(inviteId);
+            await get().fetchInvitations(); // Refresh invites
+        } catch (error: any) {
+            alert(error.response?.data?.message || "Failed to reject invitation");
+        }
+    },
 
 }));
 

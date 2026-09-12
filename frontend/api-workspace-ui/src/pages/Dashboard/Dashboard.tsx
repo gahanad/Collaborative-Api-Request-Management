@@ -4,6 +4,7 @@ import Sidebar from "../../components/layout/Sidebar";
 import WorkspaceCard from "../../components/workspace/workspaceCard";
 import { useWorkspaceStore } from "../../store/WorkspaceStore";
 import CreateWorkspaceForm from "../../components/workspace/createWorkspaceForm";
+import InvitationsList from "../../components/workspace/invitationsList";
 
 export default function Dashboard() {
     const {
@@ -37,6 +38,7 @@ export default function Dashboard() {
                         Your Workspaces
                     </p>
                     <CreateWorkspaceForm />
+                    <InvitationsList />
                     <div className="mt-6">
                         {
                             workspaces.length === 0 ? (

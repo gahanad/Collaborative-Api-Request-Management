@@ -18,9 +18,10 @@ import {
 } from "../../store/RequestStore";
 import ActiveCollaborators
     from "../../components/collaboration/activeCollaborators";
-
+import { useState } from "react";
+import InviteModal from "../../components/workspace/InviteModal";
 export default function WorkspacePage(){
-
+    const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
     const {
         workspaceId
     } = useParams();
@@ -312,6 +313,13 @@ console.log(
                         Activity
                     </Link>
 
+                    <button
+                        onClick={() => setIsInviteModalOpen(true)}
+                        className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700"
+                    >
+                        + Invite Member
+                    </button>
+
                 </div>
             </header>
             <div className="flex">
@@ -340,8 +348,11 @@ console.log(
                     <EnvironmentManager/>
                     <RequestsSidebar />
                     <RequestEditor />
-                    
-
+                    <InviteModal 
+                        workspaceId={Number(workspaceId)} 
+                        isOpen={isInviteModalOpen} 
+                        onClose={() => setIsInviteModalOpen(false)} 
+                    />
                 </div>
             </div>
         </div>
