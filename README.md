@@ -100,10 +100,6 @@ Track important workspace activities, including:
 
 **https://api-workspace-frontend.vercel.app**
 
-### Backend
-
-**https://api-workspace-backend.onrender.com**
-
 ---
 
 # 🏗️ Architecture
@@ -756,5 +752,3 @@ This project demonstrates practical experience with:
 **Gahana D.**
 
 Built as a full-stack project to explore **API development platforms, backend architecture, authentication, authorization, API execution, and real-time collaboration**.
-
-Live Demo: https://api-workspace-frontend.vercel.app
