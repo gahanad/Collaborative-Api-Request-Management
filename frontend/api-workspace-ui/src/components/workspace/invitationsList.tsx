@@ -5,7 +5,14 @@ export default function InvitationsList() {
     const { invitations, fetchInvitations, acceptInvitation, rejectInvitation } = useWorkspaceStore();
 
     useEffect(() => {
+        // 1. Fetch immediately when the component loads
         fetchInvitations();
+        // 2. Set an interval to fetch silently every 5 seconds
+        const intervalId = setInterval(() => {
+            fetchInvitations();
+        }, 5000);
+        // 3. Cleanup the interval if they leave the dashboard
+        return () => clearInterval(intervalId);
     }, [fetchInvitations]);
 
     if (!invitations || invitations.length === 0) return null;
