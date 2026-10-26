@@ -18,7 +18,6 @@ public class JwtService {
     private final long EXPIRATION_TIME_MS = 3600000; 
 
     public String generateToken(String useremail) {
-        // System.out.println("JWT Secret: " + secretString);
         return Jwts.builder()
                 .subject(useremail) // Sets the user identity
                 
@@ -48,7 +47,6 @@ public class JwtService {
     // To extract the token from authorization header:
     public String extractUserEmail(String token){
         try{
-            System.out.println("JWT Secret: " + secretString);
             return Jwts.parser()
                     .verifyWith(getSigningKey())
                     .build()

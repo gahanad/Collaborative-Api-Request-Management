@@ -48,9 +48,6 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
         if (StompCommand.CONNECT.equals(
                 accessor.getCommand())) {
 
-            System.out.println(
-                    "========== WebSocket CONNECT =========="
-            );
 
 
             String authorization =
@@ -59,10 +56,6 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
                     );
 
 
-            System.out.println(
-                    "WebSocket Authorization header present: "
-                    + (authorization != null)
-            );
 
 
             // ==========================================
@@ -90,10 +83,6 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
                     jwtService.extractUserEmail(token);
 
 
-            System.out.println(
-                    "WebSocket JWT email: "
-                    + email
-            );
 
 
             if (email == null) {
@@ -120,11 +109,6 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
             }
 
 
-            System.out.println(
-                    "WebSocket user authenticated: "
-                    + user.getEmail()
-            );
-
 
             // ==========================================
             // Create Authentication
@@ -145,15 +129,8 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
             accessor.setUser(authentication);
 
 
-            System.out.println(
-                    "WebSocket Principal set: "
-                    + accessor.getUser()
-            );
 
 
-            System.out.println(
-                    "========================================"
-            );
         }
 
 

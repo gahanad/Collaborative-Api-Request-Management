@@ -73,7 +73,7 @@ public class SecurityConfig {
                 CorsConfiguration configuration = new CorsConfiguration();
 
                 configuration.setAllowedOrigins(
-                        List.of("https://api-workspace-frontend.vercel.app")
+                        List.of("http://localhost:5173")
                 );
 
                 configuration.setAllowedMethods(

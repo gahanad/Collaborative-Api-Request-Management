@@ -73,12 +73,6 @@ public class WorkspacePresenceSubscriptionHandler {
         }
 
 
-        System.out.println(
-                "📡 Workspace subscription detected for workspace: "
-                        + workspaceId
-        );
-
-
         workspacePresenceService
                 .publishCollaboratorSnapshot(
                         workspaceId

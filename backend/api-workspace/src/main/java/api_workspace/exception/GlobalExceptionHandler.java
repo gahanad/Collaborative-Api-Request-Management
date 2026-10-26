@@ -24,7 +24,7 @@ public class GlobalExceptionHandler {
 
                 new ErrorResponse(
 
-                        HttpStatus.BAD_REQUEST.value(),
+                        HttpStatus.BAD_REQUEST,
 
                         ex.getMessage(),
 
@@ -80,7 +80,7 @@ public class GlobalExceptionHandler {
 
                 new ErrorResponse(
 
-                        HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                        HttpStatus.INTERNAL_SERVER_ERROR,
 
                         "Something went wrong.",
 
@@ -100,7 +100,7 @@ public class GlobalExceptionHandler {
 
                 new ErrorResponse(
 
-                        HttpStatus.NOT_FOUND.value(),
+                        HttpStatus.NOT_FOUND,
 
                         ex.getMessage(),
 

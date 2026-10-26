@@ -24,7 +24,6 @@ import java.util.Map;
 
 @Service
 public class ApiExecutionService {
-
     private final WorkspaceRepository workspaceRepository;
     private final CollectionRepository collectionRepository;
     private final ApiRequestRepository apiRequestRepository;
@@ -188,7 +187,6 @@ public class ApiExecutionService {
                         variable.getVariableValue()
                 );
         }
-        System.out.println("Variable Map: " + variableMap);
         // Build URL
         String resolvedUrl =
                 replaceVariables(

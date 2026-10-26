@@ -63,31 +63,8 @@ public class WorkspacePresenceService {
     public void publishCollaboratorSnapshot(
         Long workspaceId) {
 
-         System.out.println("==========================================");
-    System.out.println("🔥 PUBLISHING PRESENCE SNAPSHOT");
-    System.out.println("Workspace ID: " + workspaceId);
-
-    System.out.println(
-        "workspaceUsers = " + workspaceUsers
-    );
-
-    System.out.println(
-        "sessionWorkspaces = " + sessionWorkspaces
-    );
-
-    System.out.println(
-        "sessionUsers = " + sessionUsers
-    );
-
     Set<Long> userIds =
             workspaceUsers.get(workspaceId);
-
-    System.out.println(
-        "User IDs for workspace " +
-        workspaceId +
-        " = " +
-        userIds
-    );
 
         
 
@@ -167,11 +144,6 @@ public class WorkspacePresenceService {
                         collaborators
                 );
 
-
-        System.out.println(
-                "Broadcasting presence snapshot: "
-                        + snapshot
-        );
 
 
         messagingTemplateProvider
@@ -333,17 +305,6 @@ public class WorkspacePresenceService {
         }
 
 
-        System.out.println(
-                "[WS] Session disconnected"
-                + " | session="
-                + sessionId
-                + " | user="
-                + user.getId()
-                + " | workspace="
-                + workspaceId
-        );
-
-
         // ==========================================
         // Check if same user still has another
         // active WebSocket session
@@ -390,12 +351,6 @@ public class WorkspacePresenceService {
         // ==========================================
 
         if (userStillConnected) {
-
-            System.out.println(
-                    "[WS] User still has another"
-                    + " active session"
-            );
-
             return;
         }
 
@@ -426,15 +381,6 @@ public class WorkspacePresenceService {
 
             return;
         }
-
-
-        System.out.println(
-                "[WS] User completely left workspace"
-                + " | user="
-                + user.getName()
-                + " | workspace="
-                + workspaceId
-        );
 
 
         // ==========================================
@@ -506,11 +452,6 @@ public class WorkspacePresenceService {
 
     public void handleDisconnect(
             String sessionId) {
-
-        System.out.println(
-                "[WS] Handling disconnected session: "
-                + sessionId
-        );
 
         userLeft(sessionId);
     }

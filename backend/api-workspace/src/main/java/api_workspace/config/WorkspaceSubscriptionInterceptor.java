@@ -227,14 +227,6 @@ public class WorkspaceSubscriptionInterceptor
         );
         }
 
-        System.out.println(
-                "[WS PRESENCE] Registering user="
-                + currentUser.getEmail()
-                + " | workspace="
-                + workspaceId
-                + " | session="
-                + sessionId
-        );
 
         workspacePresenceService.userJoined(
                 sessionId,
@@ -245,14 +237,6 @@ public class WorkspaceSubscriptionInterceptor
         // ==========================================
         // Authorized
         // ==========================================
-
-        System.out.println(
-                "[WS AUTH] Subscription allowed"
-                + " | user="
-                + currentUser.getEmail()
-                + " | workspace="
-                + workspaceId
-        );
 
 
         return message;

@@ -27,10 +27,6 @@ public class WebSocketPresenceListener {
     public void handleDisconnect(
             SessionDisconnectEvent event) {
 
-        System.out.println(
-                "[WS] Session disconnected: "
-                + event.getSessionId()
-        );
 
 
         workspacePresenceService
