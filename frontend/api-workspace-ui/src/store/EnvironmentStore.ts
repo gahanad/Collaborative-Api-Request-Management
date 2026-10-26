@@ -177,10 +177,6 @@ export const useEnvironmentStore =
                     await getAllEnvironments(
                         workspaceId
                     );
-                console.log(
-                    "ENVIRONMENTS FETCHED:",
-                    environments
-                );
 
                 set({
                     environments,

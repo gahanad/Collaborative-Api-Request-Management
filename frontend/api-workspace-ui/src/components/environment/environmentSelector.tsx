@@ -1,139 +1,60 @@
+
+import { ChevronDown, Globe2 } from "lucide-react";
 import { useEnvironmentStore } from "../../store/EnvironmentStore";
 
-
 export default function EnvironmentSelector() {
-
     const {
         environments,
-
         selectedEnvironment,
-
         setSelectedEnvironment,
     } = useEnvironmentStore();
 
-
-    // ==========================================
-    // No environments
-    // ==========================================
-
     if (environments.length === 0) {
-
         return (
-
-            <div
-                className="
-                    flex
-                    items-center
-                    gap-2
-                "
-            >
-
-                <span
-                    className="
-                        text-sm
-                        text-gray-500
-                    "
-                >
+            <div className="flex h-10 max-w-full items-center gap-2 rounded-lg border border-[#eee5f5] bg-[#faf8fd] px-3">
+                <Globe2 size={14} className="shrink-0 text-[#9b8aaa]" />
+                <span className="whitespace-nowrap text-xs text-[#877994]">
                     No environment
                 </span>
-
             </div>
-
         );
     }
 
-
     return (
-
-        <div
-            className="
-                flex
-                items-center
-                gap-2
-            "
-        >
-
-            <label
-                className="
-                    text-xs
-                    font-medium
-                    text-gray-500
-                "
-            >
-                Environment
-            </label>
-
+        <div className="flex h-10 min-w-0 max-w-full items-center gap-2 rounded-lg border border-[#e5d9ef] bg-white px-2.5 transition focus-within:border-violet-400 focus-within:ring-2 focus-within:ring-violet-100">
+            <Globe2 size={14} className="shrink-0 text-violet-600" />
 
             <select
-                value={
-                    selectedEnvironment?.id ?? ""
-                }
-
+                value={selectedEnvironment?.id ?? ""}
                 onChange={(event) => {
+                    const environmentId = Number(event.target.value);
 
-                    const environmentId =
-                        Number(event.target.value);
-
-
-                    const environment =
-                        environments.find(
-                            (env) =>
-                                env.id ===
-                                environmentId
-                        );
-
+                    const environment = environments.find(
+                        (env) => env.id === environmentId
+                    );
 
                     if (environment) {
-
-                        setSelectedEnvironment(
-                            environment
-                        );
-
+                        setSelectedEnvironment(environment);
                     }
-
                 }}
-
-                className="
-                    min-w-[180px]
-                    rounded-md
-                    border
-                    border-gray-300
-                    bg-white
-                    px-3
-                    py-2
-                    text-sm
-                    text-gray-700
-                    outline-none
-                    focus:border-gray-500
-                    focus:ring-1
-                    focus:ring-gray-300
-                "
+                aria-label="Environment"
+                className="min-w-0 w-[120px] max-w-full cursor-pointer truncate border-0 bg-transparent py-1 text-xs font-medium text-[#51336b] outline-none focus:ring-0 sm:w-[145px]"
             >
-
                 {!selectedEnvironment && (
+                    <option value="">Select environment</option>
+                )}
 
-                    <option value="">
-                        Select environment
+                {environments.map((environment) => (
+                    <option key={environment.id} value={environment.id}>
+                        {environment.name}
                     </option>
-
-                )}
-
-
-                {environments.map(
-                    (environment) => (
-
-                        <option
-                            key={environment.id}
-                            value={environment.id}
-                        >
-                            {environment.name}
-                        </option>
-
-                    )
-                )}
-
+                ))}
             </select>
 
+            <ChevronDown
+                size={13}
+                className="pointer-events-none shrink-0 text-[#9b8aaa]"
+            />
         </div>
     );
 }

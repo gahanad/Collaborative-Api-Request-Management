@@ -140,12 +140,6 @@ export const useCollaborationStore =
 
                     (event) => {
 
-                        console.log(
-                            "🔥 Collaboration event received:",
-                            event
-                        );
-
-
                         set((state) => {
 
 
@@ -157,12 +151,6 @@ export const useCollaborationStore =
                                 event.type ===
                                 "COLLABORATOR_SNAPSHOT"
                             ) {
-
-                                console.log(
-                                    "👥 PRESENCE SNAPSHOT:",
-                                    event.collaborators
-                                );
-
 
                                 return {
 
@@ -191,12 +179,6 @@ export const useCollaborationStore =
                                 "COLLABORATOR_JOINED"
                             ) {
 
-                                console.log(
-                                    "🟢 Collaborator joined:",
-                                    event
-                                );
-
-
                                 return {
 
                                     events: [
@@ -220,12 +202,6 @@ export const useCollaborationStore =
                                 event.type ===
                                 "COLLABORATOR_LEFT"
                             ) {
-
-                                console.log(
-                                    "🔴 Collaborator left:",
-                                    event
-                                );
-
 
                                 return {
 
@@ -269,11 +245,6 @@ export const useCollaborationStore =
 
                     () => {
 
-                        console.log(
-                            "🟢 Collaboration WebSocket connected"
-                        );
-
-
                         set({
 
                             connected: true,
@@ -289,11 +260,6 @@ export const useCollaborationStore =
                     // ======================================
 
                     () => {
-
-                        console.log(
-                            "🔴 Collaboration WebSocket disconnected"
-                        );
-
 
                         set({
 

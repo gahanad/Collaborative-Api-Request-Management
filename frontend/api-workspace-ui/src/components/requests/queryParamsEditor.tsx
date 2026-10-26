@@ -471,7 +471,7 @@ export default function QueryParamsEditor() {
 
     return (
 
-        <div className="space-y-4 p-5">
+        <div className="space-y-4 bg-[#f8f6fc] p-5">
 
             {/* ==================================
                 Title
@@ -479,11 +479,11 @@ export default function QueryParamsEditor() {
 
             <div>
 
-                <h3 className="text-sm font-semibold text-gray-900">
+                <h3 className="text-sm font-semibold text-[#35105f]">
                     Query Parameters
                 </h3>
 
-                <p className="mt-1 text-xs text-gray-500">
+                <p className="mt-1 text-xs text-[#877994]">
                     Configure parameters that will be appended to the request URL.
                 </p>
 
@@ -496,10 +496,8 @@ export default function QueryParamsEditor() {
 
             {loading && (
 
-                <div className="rounded-md border bg-white p-4 text-sm text-gray-500">
-
+                <div className="rounded-lg border border-[#e8ddf5] bg-white p-4 text-sm text-[#877994]">
                     Loading query parameters...
-
                 </div>
 
             )}
@@ -526,23 +524,14 @@ export default function QueryParamsEditor() {
 
             {!loading && !error && (
 
-                <div className="overflow-x-auto rounded-lg border bg-white">
+                <div className="overflow-x-auto rounded-xl border border-[#e8ddf5] bg-white shadow-sm shadow-violet-950/[0.02]">
 
-                    <div className="`min-w-[700px]`">
+                    <div className="min-w-[700px]">
 
                         {/* Table Header */}
 
                         <div
-                            className="
-                                grid
-                                grid-cols-[48px_minmax(180px,1fr)_minmax(220px,1.5fr)_150px]
-                                items-center
-                                gap-2
-                                border-b
-                                bg-gray-50
-                                px-3
-                                py-2
-                            "
+                            className="grid grid-cols-[48px_minmax(180px,1fr)_minmax(220px,1.5fr)_150px] items-center gap-2 border-b border-[#e8ddf5] bg-[#f4effb] px-3 py-3"
                         >
 
                             <div />
@@ -589,16 +578,7 @@ export default function QueryParamsEditor() {
 
                                 <div
                                     key={param.id}
-                                    className="
-                                        grid
-                                        grid-cols-[48px_minmax(180px,1fr)_minmax(220px,1.5fr)_150px]
-                                        items-center
-                                        gap-2
-                                        border-b
-                                        px-3
-                                        py-2
-                                        last:border-b-0
-                                    "
+                                    className="grid grid-cols-[48px_minmax(180px,1fr)_minmax(220px,1.5fr)_150px] items-center gap-2 border-b border-[#f0e9f7] px-3 py-3 transition-colors hover:bg-[#fcfaff] last:border-b-0"
                                 >
 
                                     {/* Enabled */}
@@ -617,14 +597,7 @@ export default function QueryParamsEditor() {
                                                     event.target.checked
                                                 )
                                             }
-                                            className="
-                                                h-4
-                                                w-4
-                                                rounded
-                                                border-gray-300
-                                                text-blue-600
-                                                focus:ring-blue-500
-                                            "
+                                            className="h-4 w-4 rounded border-[#bf91f3] text-violet-600 focus:ring-violet-500"
                                             aria-label={`Enable ${draft.paramKey || "parameter"}`}
                                         />
 
@@ -646,19 +619,7 @@ export default function QueryParamsEditor() {
                                             )
                                         }
                                         placeholder="Parameter key"
-                                        className="
-                                            h-9
-                                            w-full
-                                            rounded-md
-                                            border
-                                            border-gray-300
-                                            px-3
-                                            text-sm
-                                            outline-none
-                                            focus:border-blue-500
-                                            focus:ring-2
-                                            focus:ring-blue-100
-                                        "
+                                        className="h-9 w-full rounded-lg border border-[#e4d5f3] bg-white px-3 text-sm text-[#352443] outline-none transition placeholder:text-[#b2a4bf] focus:border-violet-400 focus:ring-2 focus:ring-violet-100"
                                     />
 
 
@@ -677,19 +638,7 @@ export default function QueryParamsEditor() {
                                             )
                                         }
                                         placeholder="Parameter value"
-                                        className="
-                                            h-9
-                                            w-full
-                                            rounded-md
-                                            border
-                                            border-gray-300
-                                            px-3
-                                            text-sm
-                                            outline-none
-                                            focus:border-blue-500
-                                            focus:ring-2
-                                            focus:ring-blue-100
-                                        "
+                                        className="h-9 w-full rounded-lg border border-[#e4d5f3] bg-white px-3 text-sm text-[#352443] outline-none transition placeholder:text-[#b2a4bf] focus:border-violet-400 focus:ring-2 focus:ring-violet-100"
                                     />
 
 
@@ -708,18 +657,7 @@ export default function QueryParamsEditor() {
                                                     param
                                                 )
                                             }
-                                            className="
-                                                rounded-md
-                                                bg-blue-600
-                                                px-3
-                                                py-1.5
-                                                text-xs
-                                                font-medium
-                                                text-white
-                                                hover:bg-blue-700
-                                                disabled:cursor-not-allowed
-                                                disabled:opacity-50
-                                            "
+                                            className="rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-50"
                                         >
 
                                             {isSaving
@@ -741,17 +679,7 @@ export default function QueryParamsEditor() {
                                                     param.id
                                                 )
                                             }
-                                            className="
-                                                rounded-md
-                                                px-3
-                                                py-1.5
-                                                text-xs
-                                                font-medium
-                                                text-red-600
-                                                hover:bg-red-50
-                                                disabled:cursor-not-allowed
-                                                disabled:opacity-50
-                                            "
+                                            className="rounded-lg px-3 py-1.5 text-xs font-medium text-rose-600 transition hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-50"
                                         >
 
                                             {isDeleting
@@ -801,11 +729,11 @@ export default function QueryParamsEditor() {
 
                 <div>
 
-                    <h4 className="text-sm font-semibold text-gray-800">
+                    <h4 className="text-sm font-semibold text-[#35105f]">
                         Add Query Parameter
                     </h4>
 
-                    <p className="mt-1 text-xs text-gray-500">
+                    <p className="mt-1 text-xs text-[#877994]">
                         Add a parameter to the request URL.
                     </p>
 
@@ -840,14 +768,7 @@ export default function QueryParamsEditor() {
                                     })
                                 )
                             }
-                            className="
-                                h-4
-                                w-4
-                                rounded
-                                border-gray-300
-                                text-blue-600
-                                focus:ring-blue-500
-                            "
+                            className="h-4 w-4 rounded border-[#d8c7eb] text-violet-600 focus:ring-violet-500"
                             aria-label="Enable new parameter"
                         />
 
@@ -871,19 +792,7 @@ export default function QueryParamsEditor() {
                             )
                         }
                         placeholder="Parameter key"
-                        className="
-                            h-9
-                            w-full
-                            rounded-md
-                            border
-                            border-gray-300
-                            px-3
-                            text-sm
-                            outline-none
-                            focus:border-blue-500
-                            focus:ring-2
-                            focus:ring-blue-100
-                        "
+                        className="h-9 w-full rounded-lg border border-[#e4d5f3] bg-white px-3 text-sm text-[#352443] outline-none transition placeholder:text-[#b2a4bf] focus:border-violet-400 focus:ring-2 focus:ring-violet-100"
                     />
 
 
@@ -904,19 +813,7 @@ export default function QueryParamsEditor() {
                             )
                         }
                         placeholder="Parameter value"
-                        className="
-                            h-9
-                            w-full
-                            rounded-md
-                            border
-                            border-gray-300
-                            px-3
-                            text-sm
-                            outline-none
-                            focus:border-blue-500
-                            focus:ring-2
-                            focus:ring-blue-100
-                        "
+                        className="h-9 w-full rounded-lg border border-[#e4d5f3] bg-white px-3 text-sm text-[#352443] outline-none transition placeholder:text-[#b2a4bf] focus:border-violet-400 focus:ring-2 focus:ring-violet-100"
                     />
 
 
@@ -926,18 +823,7 @@ export default function QueryParamsEditor() {
                         type="button"
                         disabled={creating}
                         onClick={handleCreate}
-                        className="
-                            rounded-md
-                            bg-blue-600
-                            px-3
-                            py-2
-                            text-xs
-                            font-medium
-                            text-white
-                            hover:bg-blue-700
-                            disabled:cursor-not-allowed
-                            disabled:opacity-50
-                        "
+                        className="rounded-lg bg-violet-600 px-3 py-2 text-xs font-semibold text-white shadow-sm shadow-violet-600/15 transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-50"
                     >
 
                         {creating

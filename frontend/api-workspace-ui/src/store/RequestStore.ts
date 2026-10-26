@@ -30,6 +30,8 @@ interface RequestStore {
     error: string | null;
 
     hasUnsavedChanges: boolean;
+    requestsByCollection: Record<number, RequestSummary[]>;
+    
 
 
     // --------------------------------
@@ -206,10 +208,14 @@ export const useRequestStore =
                     );
 
 
-                set({
+                set((state) => ({
                     requests,
+                    requestsByCollection: {
+                        ...state.requestsByCollection,
+                        [collectionId]: requests,
+                    },
                     loading: false,
-                });
+                }));
 
 
             } catch (error) {
@@ -220,11 +226,15 @@ export const useRequestStore =
                 );
 
 
-                set({
+                set((state) => ({
                     requests: [],
+                    requestsByCollection: {
+                        ...state.requestsByCollection,
+                        [collectionId]: [],
+                    },
                     loading: false,
                     error: "Failed to load requests.",
-                });
+                }));
 
             }
 
@@ -996,5 +1006,6 @@ export const useRequestStore =
                 return null;
             }
         },
+        requestsByCollection: {},
 
     }));

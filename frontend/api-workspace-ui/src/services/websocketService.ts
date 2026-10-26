@@ -107,10 +107,6 @@ class WebSocketService {
             )
         ) {
 
-            console.log(
-                "[STOMP] Already connected/connecting"
-            );
-
             return;
         }
 
@@ -226,11 +222,6 @@ class WebSocketService {
 
         client.onConnect = () => {
 
-            console.log(
-                "[STOMP] Connected to server"
-            );
-
-
             if (
                 this.workspaceId === null
             ) {
@@ -261,12 +252,6 @@ class WebSocketService {
                 `/topic/workspaces/${this.workspaceId}`;
 
 
-            console.log(
-                "[STOMP] Subscribing to:",
-                destination
-            );
-
-
             this.subscription =
                 client.subscribe(
                     destination,
@@ -274,31 +259,12 @@ class WebSocketService {
                         message: IMessage
                     ) => {
 
-                        console.log(
-                            "[STOMP] Received data",
-                            message
-                        );
-
-
                         try {
 
                             const event =
                                 JSON.parse(
                                     message.body
                                 ) as CollaborationEvent;
-
-
-                            console.log(
-                                "🔥 WS EVENT RECEIVED",
-                                event
-                            );
-
-
-                            console.log(
-                                "Collaboration event:",
-                                event
-                            );
-
 
                             // ==========================================
                             // Send event to Zustand
@@ -322,11 +288,6 @@ class WebSocketService {
                         }
                     }
                 );
-
-
-            console.log(
-                "[STOMP] Workspace subscription active"
-            );
 
 
             // ==========================================
@@ -415,9 +376,6 @@ class WebSocketService {
                 !this.intentionalDisconnect
             ) {
 
-                console.log(
-                    "[STOMP] Reconnection will be attempted automatically"
-                );
             }
         };
 
@@ -428,11 +386,6 @@ class WebSocketService {
 
         client.onDisconnect = () => {
 
-            console.log(
-                "[STOMP] Disconnected"
-            );
-
-
             this.subscription =
                 null;
 
@@ -442,12 +395,6 @@ class WebSocketService {
         // ==========================================
         // Activate Client
         // ==========================================
-
-        console.log(
-            "[STOMP] Activating client..."
-        );
-
-
         client.activate();
     }
 
@@ -457,11 +404,6 @@ class WebSocketService {
     // ==========================================
 
     disconnect(): void {
-
-        console.log(
-            "[STOMP] Intentional disconnect"
-        );
-
 
         this.intentionalDisconnect =
             true;

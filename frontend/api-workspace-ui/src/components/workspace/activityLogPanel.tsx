@@ -40,29 +40,20 @@ function getActionLabel(
 }
 
 
-function getActionClass(
-    action: string
-): string {
-
+function getActionClass(action: string): string {
     switch (action) {
-
         case "CREATED":
-            return "text-green-600";
-
+            return "text-emerald-400";
         case "UPDATED":
-            return "text-blue-600";
-
+            return "text-sky-400";
         case "DELETED":
-            return "text-red-600";
-
+            return "text-rose-400";
         case "EXECUTED":
-            return "text-purple-600";
-
+            return "text-violet-300";
         case "RUN_COLLECTION":
-            return "text-orange-600";
-
+            return "text-amber-400";
         default:
-            return "text-gray-600";
+            return "text-[#C1B3D1]";
     }
 }
 
@@ -187,13 +178,7 @@ export default function ActivityLogPanel() {
     return (
 
         <section
-            className="
-                flex
-                h-full
-                min-h-0
-                flex-col
-                bg-gray-50
-            "
+            className="flex h-full min-h-0 flex-col bg-[#100B1B] text-[#F5F0FF]"
         >
 
             {/* ==================================
@@ -201,36 +186,18 @@ export default function ActivityLogPanel() {
             ================================== */}
 
             <div
-                className="
-                    flex
-                    shrink-0
-                    flex-wrap
-                    items-center
-                    gap-3
-                    border-b
-                    bg-white
-                    px-5
-                    py-3
-                "
+                className="flex shrink-0 flex-wrap items-center gap-3 border-b border-[#3B2B4D] bg-[#191123]/95 px-5 py-4"
             >
                 <div>
 
                     <h2
-                        className="
-                            text-lg
-                            font-semibold
-                            text-gray-900
-                        "
+                        className="text-lg font-semibold text-[#F5F0FF]"
                     >
                         Workspace Activity
                     </h2>
 
                     <p
-                        className="
-                            mt-1
-                            text-xs
-                            text-gray-500
-                        "
+                        className="mt-1 text-xs text-[#B9A9CB]"
                     >
                         Recent actions performed
                         in this workspace.
@@ -240,15 +207,7 @@ export default function ActivityLogPanel() {
 
 
                 <span
-                    className="
-                        rounded-full
-                        bg-gray-100
-                        px-3
-                        py-1
-                        text-xs
-                        font-medium
-                        text-gray-600
-                    "
+                    className="rounded-full border border-violet-400/20 bg-violet-500/10 px-3 py-1 text-xs font-medium text-violet-300"
                 >
                     {activities.length}
                     {" "}
@@ -267,17 +226,7 @@ export default function ActivityLogPanel() {
             ================================== */}
 
             <div
-                className="
-                    flex
-                    shrink-0
-                    flex-wrap
-                    items-center
-                    gap-3
-                    border-b
-                    bg-white
-                    px-5
-                    py-3
-                "
+                className="flex shrink-0 flex-wrap items-center gap-3 border-b border-[#3B2B4D] bg-[#191123]/80 px-5 py-3"
             >
 
                 {/* ==================================
@@ -293,11 +242,7 @@ export default function ActivityLogPanel() {
                 >
 
                     <span
-                        className="
-                            text-xs
-                            font-medium
-                            text-gray-500
-                        "
+                        className="text-xs font-medium text-[#B9A9CB]"
                     >
                         Action
                     </span>
@@ -311,18 +256,7 @@ export default function ActivityLogPanel() {
                             setAction(value);
 
                         }}
-                        className="
-                            rounded-md
-                            border
-                            border-gray-300
-                            bg-white
-                            px-3
-                            py-1.5
-                            text-xs
-                            text-gray-700
-                            outline-none
-                            focus:border-gray-500
-                        "
+                        className="rounded-lg border border-[#49365E] bg-[#21172F] px-3 py-2 text-xs text-[#F5F0FF] outline-none transition focus:border-violet-400 focus:ring-2 focus:ring-violet-500/20"
                     >
 
                         <option value="">
@@ -387,18 +321,7 @@ export default function ActivityLogPanel() {
                             setResourceType(value);
 
                         }}
-                        className="
-                            rounded-md
-                            border
-                            border-gray-300
-                            bg-white
-                            px-3
-                            py-1.5
-                            text-xs
-                            text-gray-700
-                            outline-none
-                            focus:border-gray-500
-                        "
+                        className="rounded-md border border-[#49365E] bg-[#241831] px-2 py-0.5 text-[11px] font-medium text-[#C4A5FF]"
                     >
 
                         <option value="">
@@ -451,17 +374,7 @@ export default function ActivityLogPanel() {
                         }
 
                     }}
-                    className="
-                        rounded-md
-                        border
-                        border-gray-300
-                        px-3
-                        py-1.5
-                        text-xs
-                        font-medium
-                        text-gray-600
-                        hover:bg-gray-50
-                    "
+                    className="rounded-lg border border-[#49365E] px-3 py-2 text-xs font-medium text-[#C1B3D1] transition hover:border-violet-400/50 hover:bg-[#2D2040] hover:text-white"
                 >
                     Clear Filters
                 </button>
@@ -483,20 +396,7 @@ export default function ActivityLogPanel() {
 
                     }}
                     disabled={loading}
-                    className="
-                        rounded-md
-                        border
-                        border-gray-300
-                        bg-white
-                        px-3
-                        py-1.5
-                        text-xs
-                        font-medium
-                        text-gray-700
-                        hover:bg-gray-50
-                        disabled:cursor-not-allowed
-                        disabled:opacity-50
-                    "
+                    className="rounded-lg border border-[#49365E] bg-[#241831] px-3 py-2 text-xs font-medium text-[#E5D8F5] transition hover:border-violet-400/50 hover:bg-[#30203F] disabled:cursor-not-allowed disabled:opacity-50"
                 >
                     {loading ? "Refreshing..." : "Refresh"}
                 </button>
@@ -711,11 +611,7 @@ export default function ActivityLogPanel() {
                     >
 
                         <div
-                            className="
-                                divide-y
-                                divide-gray-200
-                                bg-white
-                            "
+                            className="divide-y divide-[#352542] bg-[#171122]"
                         >
 
                             {activities.map(
@@ -723,12 +619,7 @@ export default function ActivityLogPanel() {
 
                                 <div
                                     key={activity.id}
-                                    className="
-                                        px-5
-                                        py-4
-                                        transition
-                                        hover:bg-gray-50
-                                    "
+                                    className="px-5 py-4 transition-colors hover:bg-[#21172F]/80"
                                 >
 
                                     <div
@@ -761,11 +652,7 @@ export default function ActivityLogPanel() {
                                                 {/* User */}
 
                                                 <span
-                                                    className="
-                                                        text-sm
-                                                        font-semibold
-                                                        text-gray-800
-                                                    "
+                                                    className="text-sm font-semibold text-[#F5F0FF]"
                                                 >
                                                     {
                                                         activity.userName
@@ -868,16 +755,7 @@ export default function ActivityLogPanel() {
                     ================================== */}
 
                     <div
-                        className="
-                            flex
-                            shrink-0
-                            items-center
-                            justify-between
-                            border-t
-                            bg-white
-                            px-5
-                            py-3
-                        "
+                        className="flex shrink-0 items-center justify-between gap-3 border-t border-[#3B2B4D] bg-[#191123] px-5 py-3"
                     >
 
                         {/* ==================================
@@ -885,10 +763,7 @@ export default function ActivityLogPanel() {
                         ================================== */}
 
                         <p
-                            className="
-                                text-xs
-                                text-gray-500
-                            "
+                            className="text-xs text-[#B9A9CB]"
                         >
                             Page {page + 1} of {totalPages}
                             {" · "}
@@ -929,19 +804,7 @@ export default function ActivityLogPanel() {
                                     );
 
                                 }}
-                                className="
-                                    rounded-md
-                                    border
-                                    border-gray-300
-                                    px-3
-                                    py-1.5
-                                    text-xs
-                                    font-medium
-                                    text-gray-700
-                                    hover:bg-gray-50
-                                    disabled:cursor-not-allowed
-                                    disabled:opacity-40
-                                "
+                                className="rounded-lg border border-[#49365E] bg-[#241831] px-3 py-2 text-xs font-medium text-[#E5D8F5] transition hover:border-violet-400/50 hover:bg-[#30203F] disabled:cursor-not-allowed disabled:opacity-40"
                             >
                                 Previous
                             </button>
@@ -968,19 +831,7 @@ export default function ActivityLogPanel() {
                                     );
 
                                 }}
-                                className="
-                                    rounded-md
-                                    border
-                                    border-gray-300
-                                    px-3
-                                    py-1.5
-                                    text-xs
-                                    font-medium
-                                    text-gray-700
-                                    hover:bg-gray-50
-                                    disabled:cursor-not-allowed
-                                    disabled:opacity-40
-                                "
+                                className="rounded-lg border border-[#49365E] bg-[#241831] px-3 py-2 text-xs font-medium text-[#E5D8F5] transition hover:border-violet-400/50 hover:bg-[#30203F] disabled:cursor-not-allowed disabled:opacity-40"
                             >
                                 Next
                             </button>

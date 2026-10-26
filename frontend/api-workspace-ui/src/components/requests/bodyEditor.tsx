@@ -475,26 +475,8 @@ export default function BodyEditor() {
                                 : "Enter request body..."
                         }
                         spellCheck={false}
-                        className="
-                            `min-h-[320px]`
-                            flex-1
-                            resize-none
-                            rounded-lg
-                            border
-                            border-gray-300
-                            bg-gray-950
-                            px-4
-                            py-4
-                            font-mono
-                            text-sm
-                            leading-6
-                            text-gray-100
-                            outline-none
-                            placeholder:text-gray-500
-                            focus:border-blue-500
-                            focus:ring-2
-                            focus:ring-blue-100
-                        "
+                        className="min-h-[180px] w-full min-w-0 flex-1 resize-none rounded-lg border border-[#e5d9ef] bg-[#17121f] px-4 py-4 font-mono text-sm leading-6 text-gray-100 outline-none placeholder:text-gray-500
+                         focus:border-violet-400 focus:ring-2 focus:ring-violet-100"
                     />
 
 

@@ -73,3 +73,22 @@ export default defineConfig([
 ])
 
 ```
+
+
+## Frontend-only preview (no backend)
+
+To preview the dashboard without connecting to Spring Boot, create a `.env` file in this folder with:
+
+```env
+VITE_DEMO_MODE=true
+```
+
+Then run `npm install` and `npm run dev`. Demo mode displays sample workspaces and keeps workspace creation/deletion local to the browser session. Invitations are intentionally empty. API request execution and other backend-dependent features are not connected in this mode. Remove or set `VITE_DEMO_MODE=false` when you want to use the real backend again.
+
+## Frontend-only workspace preview
+
+To preview the redesigned workspace UI without a backend or login, run the frontend and open:
+
+`http://localhost:5173/preview/workspace`
+
+This route uses sample data and does not call the backend. The Send button displays a local sample response only. It is intended for local UI review, not production use.

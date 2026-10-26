@@ -74,11 +74,11 @@ export default function CreateWorkspaceForm() {
 
             onSubmit={handleSubmit}
 
-            className="border rounded-lg p-5 mb-6"
+            className="aw-card grid gap-4 p-5 sm:grid-cols-[1fr_1fr_auto] sm:items-end"
 
         >
 
-            <h2 className="text-xl font-semibold mb-4">
+            <h2 className="text-sm font-semibold text-[#35105f] sm:col-span-3">
 
                 Create Workspace
 
@@ -98,7 +98,7 @@ export default function CreateWorkspaceForm() {
 
                 }
 
-                className="border rounded w-full p-2 mb-3"
+                className="aw-input"
 
             />
 
@@ -114,7 +114,7 @@ export default function CreateWorkspaceForm() {
 
                 }
 
-                className="border rounded w-full p-2 mb-4"
+                className="aw-input min-h-10 resize-y"
 
             />
 
@@ -124,7 +124,7 @@ export default function CreateWorkspaceForm() {
 
                 disabled={loading}
 
-                className="bg-green-600 text-white px-4 py-2 rounded"
+                className="aw-primary inline-flex min-h-10 items-center justify-center px-4 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-60"
 
             >
 

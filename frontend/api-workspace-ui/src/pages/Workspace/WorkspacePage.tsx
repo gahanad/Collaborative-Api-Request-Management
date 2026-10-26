@@ -4,7 +4,6 @@ import { useWorkspaceStore }
 from "../../store/WorkspaceStore";
 import { useCollectionStore } from "../../store/CollectionStore";
 import CollectionsSidebar from "../../components/workspace/collectionSidebar";
-import RequestsSidebar from "../../components/workspace/requestsSidebar";
 import RequestEditor from "../../components/requests/requestEditor";
 import { useEnvironmentStore } from "@/store/EnvironmentStore";
 import EnvironmentManager
@@ -56,13 +55,8 @@ export default function WorkspacePage(){
     } = useCollaborationStore();
 
     const {
-    activeCollaborators,
 } = useCollaborationStore();
 
-console.log(
-    "🔥 WorkspacePage activeCollaborators:",
-    activeCollaborators
-);
 
     // ==========================================
     // Synchronize UI with Collaboration Events
@@ -98,11 +92,6 @@ console.log(
             return;
         }
 
-
-        console.log(
-            "Synchronizing UI:",
-            latestEvent
-        );
 
 
         // ==========================================
@@ -237,19 +226,9 @@ console.log(
             return;
         }
 
-        console.log(
-            "Connecting collaboration WebSocket for workspace:",
-            id
-        );
-
         connectCollaboration(id);
 
         return () => {
-
-            console.log(
-                "Disconnecting collaboration WebSocket for workspace:",
-                id
-            );
 
             disconnectCollaboration();
 
@@ -274,86 +253,60 @@ console.log(
         return <h2>Workspace Not Found</h2>;
     }
 
-    return(
-        <div className="min-h-screen bg-gray-100 overflow-x-auto">
-            <header
-                className="bg-white shadow px-6 py-4"
-            >
-                <div>
-                    <h1 className="text-3xl font-bold">
-                        {selectedWorkspace.name}
-                    </h1>
+    
+    
+    return (
+        <div className="flex h-dvh min-h-0 flex-col overflow-hidden bg-[#090711] text-[#f5f3ff]">
+            {/* Workspace header */}
+            <header className="z-20 flex shrink-0 items-center justify-between gap-4 border-b border-[#292238] bg-[#0d0a16] px-5 py-3">
+                {/* Workspace title + environment */}
+                <div className="flex min-w-0 flex-1 items-center gap-6">
+                    <div className="min-w-0 shrink-0">
+                        <h1 className="truncate text-xl font-semibold tracking-tight text-[#f5f3ff]">
+                            {selectedWorkspace.name}
+                        </h1>
 
-                    <p className="text-gray-600">
-                        {selectedWorkspace.description ||
-                            "No Description"}
-                    </p>
+                        <p className="truncate text-sm text-[#a79ab9]">
+                            {selectedWorkspace.description || "No Description"}
+                        </p>
+                    </div>
+
+                    <div className="shrink-0">
+                        <EnvironmentManager />
+                    </div>
                 </div>
 
-
-                <div className="flex items-center gap-4">
-
+                {/* Collaboration + actions */}
+                <div className="flex shrink-0 items-center gap-3">
                     <ActiveCollaborators />
 
                     <Link
                         to={`/workspaces/${workspaceId}/activity`}
-                        className="
-                            rounded-md
-                            border
-                            border-gray-300
-                            bg-white
-                            px-4
-                            py-2
-                            text-sm
-                            font-medium
-                            text-gray-700
-                            hover:bg-gray-50
-                        "
+                        className="rounded-lg border border-[#332a47] bg-[#151120] px-3 py-2 text-sm font-medium text-[#d6c8e8] transition hover:border-[#7043ad] hover:bg-[#211832]"
                     >
                         Activity
                     </Link>
 
                     <button
+                        type="button"
                         onClick={() => setIsInviteModalOpen(true)}
-                        className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700"
+                        className="aw-primary whitespace-nowrap px-4 py-2 text-sm font-medium"
                     >
                         + Invite Member
                     </button>
-
                 </div>
             </header>
-            <div className="flex">
-                {/* <aside
-                    className="w-72 bg-white border-r min-h-screen p-5"
-                >
-                    <h2
-                        className="font-semibold mb-4"
-                    >
-                        Collections
-                    </h2>
-                    <button
-                        className="w-full bg-blue-600 text-white py-2 rounded"
-                    >
-                        + Create Collection
-                    </button>
-                    <div
-                        className="mt-5 text-gray-500"
-                    >
-                        No Collections Yet
-                    </div>
-                </aside> */}
-                <div className="flex h-full">
 
-                    <CollectionsSidebar />
-                    <EnvironmentManager/>
-                    <RequestsSidebar />
-                    <RequestEditor />
-                    <InviteModal 
-                        workspaceId={Number(workspaceId)} 
-                        isOpen={isInviteModalOpen} 
-                        onClose={() => setIsInviteModalOpen(false)} 
-                    />
-                </div>
+            {/* Workspace panels */}
+            <div className="flex min-h-0 min-w-0 flex-1 overflow-hidden">
+                <CollectionsSidebar />
+                <RequestEditor />
+
+                <InviteModal
+                    workspaceId={Number(workspaceId)}
+                    isOpen={isInviteModalOpen}
+                    onClose={() => setIsInviteModalOpen(false)}
+                />
             </div>
         </div>
     );

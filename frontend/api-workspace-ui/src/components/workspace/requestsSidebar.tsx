@@ -639,11 +639,11 @@ export default function RequestsSidebar() {
 
                 {/* Header */}
 
-                <div className="border-b p-4">
+                <div className="border-b border-[#f0e8f6] px-4 py-4">
 
                     <div className="flex items-center justify-between">
 
-                        <h2 className="text-sm font-semibold text-gray-900">
+                        <h2 className="text-sm font-bold tracking-tight text-[#35105f]">
                             Requests
                         </h2>
 
@@ -654,16 +654,8 @@ export default function RequestsSidebar() {
                                 onClick={() =>
                                     setNewRequestModalOpen(true)
                                 }
-                                className="
-                                    rounded-md
-                                    px-2
-                                    py-1
-                                    text-xs
-                                    font-medium
-                                    text-gray-600
-                                    hover:bg-gray-100
-                                    hover:text-gray-900
-                                "
+                                className="inline-flex items-center gap-1.5 rounded-lg bg-violet-600 px-3 py-2 text-xs font-semibold text-white shadow-sm 
+                                shadow-violet-600/20 transition hover:bg-violet-700 active:scale-[0.98]"
                             >
                                 + New
                             </button>
@@ -676,12 +668,7 @@ export default function RequestsSidebar() {
                     {selectedCollection && (
 
                         <p
-                            className="
-                                mt-1
-                                truncate
-                                text-xs
-                                text-gray-500
-                            "
+                            className="truncate text-xs font-semibold text-[#6d4b86]"
                             title={selectedCollection.name}
                         >
                             {selectedCollection.name}
@@ -694,13 +681,13 @@ export default function RequestsSidebar() {
 
                 {/* Request List */}
 
-                <div className="min-h-0 flex-1 overflow-y-auto">
+                <div className="min-h-0 flex-1 overflow-y-auto py-2">
 
                     {/* No collection selected */}
 
                     {!selectedCollection && (
 
-                        <div className="p-4 text-sm text-gray-500">
+                        <div className="px-4 py-8 text-center text-xs text-[#9b8aaa]">
 
                             Select a collection to view requests.
 
@@ -714,7 +701,7 @@ export default function RequestsSidebar() {
                     {selectedCollection &&
                         requestLoading && (
 
-                            <div className="p-4 text-sm text-gray-500">
+                            <div className="px-4 py-8 text-center text-xs text-[#9b8aaa]">
 
                                 Loading requests...
 
@@ -730,7 +717,7 @@ export default function RequestsSidebar() {
                         !requestLoading &&
                         requestError && (
 
-                            <div className="p-4 text-sm text-red-600">
+                            <div className="mx-3 my-3 rounded-lg border border-rose-100 bg-rose-50 px-3 py-2 text-xs text-rose-700">
 
                                 {requestError}
 
@@ -747,7 +734,7 @@ export default function RequestsSidebar() {
                         !requestError &&
                         requests.length === 0 && (
 
-                            <div className="p-4 text-sm text-gray-500">
+                            <div className="flex flex-col items-center px-5 py-10 text-center">
 
                                 No requests found.
 
@@ -769,11 +756,11 @@ export default function RequestsSidebar() {
                                 {requests.map((request) => (
 
                                     <RequestItem
-                                        key={request.id}
+                                        // key={request.id}
 
                                         request={request}
 
-                                        selected={
+                                        isSelected={
                                             isSelectedRequestFromCurrentCollection &&
                                                 selectedRequest?.id === request.id
                                         }
